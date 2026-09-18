@@ -43,7 +43,7 @@ h1 {
 }
 
 .lede {
-  margin: 0 0 36px;
+  margin: 0 0 12px;
   color: var(--muted);
   font-size: 17px;
 }
@@ -187,4 +187,61 @@ h1 {
 .bulb.on {
   fill: var(--warm);
   stroke: var(--warm);
+}
+
+.shelf {
+  margin-top: 36px;
+}
+
+.shelf h2 {
+  margin: 0 0 6px;
+  font-size: 24px;
+}
+
+.shelf-lede {
+  margin: 0 0 16px;
+  color: var(--muted);
+}
+
+.shelf h2 + .games {
+  margin-top: 16px;
+}
+
+.card.soon {
+  border-style: dashed;
+}
+
+.badge {
+  align-self: flex-start;
+  margin-top: 6px;
+  padding: 3px 10px;
+  border: 1px solid var(--warm);
+  border-radius: 999px;
+  color: var(--warm);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.step {
+  fill: #1d2448;
+  stroke: rgba(160, 180, 255, 0.45);
+}
+
+.step-word {
+  fill: var(--text);
+  font: 700 11px "Space Grotesk", system-ui, sans-serif;
+  text-anchor: middle;
+}
+
+.relay {
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-dasharray: 2 3;
+}
+
+.doodle {
+  fill: none;
+  stroke: var(--warm);
+  stroke-width: 2;
+  stroke-linecap: round;
 }

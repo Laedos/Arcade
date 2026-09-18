@@ -19,76 +19,105 @@
         <p class="lede">Small games that run in your browser. No installs, no accounts.</p>
       </header>
 
-      <ul class="games">
-        <li>
-          <a class="card" href="./slingwell/">
-            <svg class="thumb" viewBox="0 0 160 100" aria-hidden="true">
-              <circle cx="48" cy="62" r="26" class="orbit" />
-              <circle cx="48" cy="62" r="11" class="planet planet-a" />
-              <circle cx="118" cy="30" r="20" class="orbit" />
-              <circle cx="118" cy="30" r="8" class="planet planet-b" />
-              <path d="M74 60 L104 38" class="path" />
-              <circle cx="74" cy="60" r="4" class="player" />
-            </svg>
-            <span class="card-body">
-              <span class="title">Slingwell</span>
-              <span class="blurb">Circle a planet, let go at the right moment, get caught by the next orbit. One button.</span>
-              <span class="play">Play →</span>
-            </span>
-          </a>
-        </li>
-        <li>
-          <a class="card" href="./stacker/">
-            <svg class="thumb" viewBox="0 0 160 100" aria-hidden="true">
-              <rect x="40" y="80" width="80" height="12" class="block" style="--h: 20" />
-              <rect x="46" y="68" width="74" height="12" class="block" style="--h: 60" />
-              <rect x="46" y="56" width="66" height="12" class="block" style="--h: 110" />
-              <rect x="52" y="44" width="60" height="12" class="block" style="--h: 170" />
-              <rect x="88" y="26" width="60" height="12" class="block moving" style="--h: 230" />
-              <rect x="112" y="62" width="10" height="8" class="block debris" style="--h: 110" />
-            </svg>
-            <span class="card-body">
-              <span class="title">Stacker</span>
-              <span class="blurb">Drop the sliding block. Whatever hangs over gets cut off. How tall can you build?</span>
-              <span class="play">Play →</span>
-            </span>
-          </a>
-        </li>
-        <li>
-          <a class="card" href="./snake/">
-            <svg class="thumb" viewBox="0 0 160 100" aria-hidden="true">
-              <path d="M30 70 H70 V40 H110" class="snake-body" />
-              <circle cx="128" cy="40" r="5" class="apple" />
-              <path d="M60 22 l-8 6 8 6 M100 22 l8 6 -8 6" class="mirror" />
-            </svg>
-            <span class="card-body">
-              <span class="title">Mirror Snake</span>
-              <span class="blurb">Classic snake, except every fourth apple flips your controls for a few seconds.</span>
-              <span class="play">Play →</span>
-            </span>
-          </a>
-        </li>
-        <li>
-          <a class="card" href="./lights-out/">
-            <svg class="thumb" viewBox="0 0 160 100" aria-hidden="true">
-              <rect x="50" y="14" width="18" height="18" rx="4" class="bulb on" />
-              <rect x="71" y="14" width="18" height="18" rx="4" class="bulb" />
-              <rect x="92" y="14" width="18" height="18" rx="4" class="bulb on" />
-              <rect x="50" y="35" width="18" height="18" rx="4" class="bulb" />
-              <rect x="71" y="35" width="18" height="18" rx="4" class="bulb on" />
-              <rect x="92" y="35" width="18" height="18" rx="4" class="bulb" />
-              <rect x="50" y="56" width="18" height="18" rx="4" class="bulb on" />
-              <rect x="71" y="56" width="18" height="18" rx="4" class="bulb on" />
-              <rect x="92" y="56" width="18" height="18" rx="4" class="bulb" />
-            </svg>
-            <span class="card-body">
-              <span class="title">Lights Out</span>
-              <span class="blurb">Each light flips itself and its neighbours. Switch them all off in as few moves as you can.</span>
-              <span class="play">Play →</span>
-            </span>
-          </a>
-        </li>
-      </ul>
+      <section class="shelf" aria-labelledby="single-player">
+        <h2 id="single-player">Single player</h2>
+        <ul class="games">
+          <li>
+            <a class="card" href="./slingwell/">
+              <svg class="thumb" viewBox="0 0 160 100" aria-hidden="true">
+                <circle cx="48" cy="62" r="26" class="orbit" />
+                <circle cx="48" cy="62" r="11" class="planet planet-a" />
+                <circle cx="118" cy="30" r="20" class="orbit" />
+                <circle cx="118" cy="30" r="8" class="planet planet-b" />
+                <path d="M74 60 L104 38" class="path" />
+                <circle cx="74" cy="60" r="4" class="player" />
+              </svg>
+              <span class="card-body">
+                <span class="title">Slingwell</span>
+                <span class="blurb">Circle a planet, let go at the right moment, get caught by the next orbit. One button.</span>
+                <span class="play">Play →</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a class="card" href="./stacker/">
+              <svg class="thumb" viewBox="0 0 160 100" aria-hidden="true">
+                <rect x="40" y="80" width="80" height="12" class="block" style="--h: 20" />
+                <rect x="46" y="68" width="74" height="12" class="block" style="--h: 60" />
+                <rect x="46" y="56" width="66" height="12" class="block" style="--h: 110" />
+                <rect x="52" y="44" width="60" height="12" class="block" style="--h: 170" />
+                <rect x="88" y="26" width="60" height="12" class="block moving" style="--h: 230" />
+                <rect x="112" y="62" width="10" height="8" class="block debris" style="--h: 110" />
+              </svg>
+              <span class="card-body">
+                <span class="title">Stacker</span>
+                <span class="blurb">Drop the sliding block. Whatever hangs over gets cut off. How tall can you build?</span>
+                <span class="play">Play →</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a class="card" href="./snake/">
+              <svg class="thumb" viewBox="0 0 160 100" aria-hidden="true">
+                <path d="M30 70 H70 V40 H110" class="snake-body" />
+                <circle cx="128" cy="40" r="5" class="apple" />
+                <path d="M60 22 l-8 6 8 6 M100 22 l8 6 -8 6" class="mirror" />
+              </svg>
+              <span class="card-body">
+                <span class="title">Mirror Snake</span>
+                <span class="blurb">Classic snake, except every fourth apple flips your controls for a few seconds.</span>
+                <span class="play">Play →</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a class="card" href="./lights-out/">
+              <svg class="thumb" viewBox="0 0 160 100" aria-hidden="true">
+                <rect x="50" y="14" width="18" height="18" rx="4" class="bulb on" />
+                <rect x="71" y="14" width="18" height="18" rx="4" class="bulb" />
+                <rect x="92" y="14" width="18" height="18" rx="4" class="bulb on" />
+                <rect x="50" y="35" width="18" height="18" rx="4" class="bulb" />
+                <rect x="71" y="35" width="18" height="18" rx="4" class="bulb on" />
+                <rect x="92" y="35" width="18" height="18" rx="4" class="bulb" />
+                <rect x="50" y="56" width="18" height="18" rx="4" class="bulb on" />
+                <rect x="71" y="56" width="18" height="18" rx="4" class="bulb on" />
+                <rect x="92" y="56" width="18" height="18" rx="4" class="bulb" />
+              </svg>
+              <span class="card-body">
+                <span class="title">Lights Out</span>
+                <span class="blurb">Each light flips itself and its neighbours. Switch them all off in as few moves as you can.</span>
+                <span class="play">Play →</span>
+              </span>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <section class="shelf" aria-labelledby="multiplayer">
+        <h2 id="multiplayer">Multiplayer</h2>
+        <p class="shelf-lede">Grab some friends, share a room code, play together from any device.</p>
+        <ul class="games">
+          <li>
+            <div class="card soon">
+              <svg class="thumb" viewBox="0 0 160 100" aria-hidden="true">
+                <rect x="12" y="34" width="36" height="32" rx="6" class="step" />
+                <text x="30" y="54" class="step-word">cat</text>
+                <path d="M52 50 h10" class="relay" />
+                <rect x="64" y="30" width="36" height="40" rx="6" class="step" />
+                <path d="M72 60 q4 -16 12 -14 q8 2 8 14 M78 44 l-3 -6 M86 44 l3 -6" class="doodle" />
+                <path d="M104 50 h10" class="relay" />
+                <rect x="116" y="34" width="36" height="32" rx="6" class="step" />
+                <text x="134" y="54" class="step-word">fox?</text>
+              </svg>
+              <span class="card-body">
+                <span class="title">Doodle Telephone</span>
+                <span class="blurb">Write a prompt, draw what you're handed, guess what you see. Watch the chain fall apart at the end.</span>
+                <span class="badge">In development</span>
+              </span>
+            </div>
+          </li>
+        </ul>
+      </section>
     </main>
   </body>
 </html>
