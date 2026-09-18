@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { type ConnectionEvents, createRoom, httpToWs, localTokenStore, RoomConnection, type TokenStore } from './connection'
-import type { RoomView } from './protocol'
+import type { BaseRoomView } from './protocol'
 
 class FakeSocket extends EventTarget {
   readyState = 0
@@ -37,8 +37,8 @@ function memoryTokens(initial: Record<string, string> = {}): TokenStore {
 
 function setup(tokens = memoryTokens()) {
   const sockets: FakeSocket[] = []
-  const events = { onState: vi.fn(), onError: vi.fn(), onStatus: vi.fn() } satisfies ConnectionEvents
-  const connection = new RoomConnection('https://rooms.example', 'ABCD', 'Ana Bo', tokens, events, (url) => {
+  const events = { onState: vi.fn(), onError: vi.fn(), onStatus: vi.fn() } satisfies ConnectionEvents<BaseRoomView>
+  const connection = new RoomConnection<BaseRoomView, { type: string }>('https://rooms.example', 'doodle', 'ABCD', 'Ana Bo', tokens, events, (url) => {
     const socket = new FakeSocket(url)
     sockets.push(socket)
     return socket as unknown as WebSocket
@@ -46,7 +46,7 @@ function setup(tokens = memoryTokens()) {
   return { connection, sockets, events, tokens }
 }
 
-const room = { code: 'ABCD' } as RoomView
+const room = { code: 'ABCD' } as BaseRoomView
 
 beforeEach(() => vi.useFakeTimers())
 afterEach(() => vi.useRealTimers())
@@ -61,13 +61,13 @@ describe('httpToWs', () => {
 describe('createRoom', () => {
   it('posts to the API and returns the code', async () => {
     const fetcher = vi.fn().mockResolvedValue(new Response(JSON.stringify({ code: 'WXYZ' }), { status: 201 }))
-    await expect(createRoom('https://rooms.example', fetcher)).resolves.toBe('WXYZ')
+    await expect(createRoom('https://rooms.example', 'doodle', fetcher)).resolves.toBe('WXYZ')
     expect(fetcher).toHaveBeenCalledWith('https://rooms.example/doodle/rooms', { method: 'POST' })
   })
 
   it('throws a readable error when the server refuses', async () => {
     const fetcher = vi.fn().mockResolvedValue(new Response('nope', { status: 503 }))
-    await expect(createRoom('https://rooms.example', fetcher)).rejects.toThrow('Could not create a room')
+    await expect(createRoom('https://rooms.example', 'doodle', fetcher)).rejects.toThrow('Could not create a room')
   })
 })
 
@@ -162,7 +162,7 @@ describe('RoomConnection', () => {
 describe('localTokenStore', () => {
   it('keeps one token per room code', () => {
     const values = new Map<string, string>()
-    const store = localTokenStore({ getItem: (k) => values.get(k) ?? null, setItem: (k, v) => void values.set(k, v) })
+    const store = localTokenStore('doodle-telephone', { getItem: (k) => values.get(k) ?? null, setItem: (k, v) => void values.set(k, v) })
     store.set('ABCD', 't1')
     expect(store.get('ABCD')).toBe('t1')
     expect(store.get('WXYZ')).toBeNull()
@@ -170,11 +170,11 @@ describe('localTokenStore', () => {
   })
 
   it('works without storage, and when storage throws', () => {
-    const none = localTokenStore(null)
+    const none = localTokenStore('doodle-telephone', null)
     none.set('ABCD', 't')
     expect(none.get('ABCD')).toBeNull()
 
-    const broken = localTokenStore({
+    const broken = localTokenStore('doodle-telephone', {
       getItem: () => {
         throw new Error('blocked')
       },
@@ -187,6 +187,6 @@ describe('localTokenStore', () => {
   })
 
   it('defaults to the browser localStorage when there is one', () => {
-    expect(localTokenStore().get('ABCD')).toBeNull()
+    expect(localTokenStore('doodle-telephone').get('ABCD')).toBeNull()
   })
 })

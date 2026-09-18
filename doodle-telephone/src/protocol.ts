@@ -1,11 +1,13 @@
 // Wire format between the Doodle Telephone page and its room server (server/). Both sides
 // import this file, so a change here is a change to both.
+import type { BaseRoomView, PlayerView as BasePlayerView, ServerMessage as BaseServerMessage } from '../../shared/src/rooms/protocol'
+
+export { MAX_NAME_LENGTH } from '../../shared/src/rooms/protocol'
 
 export const CANVAS_SIZE = 1000
 export const PALETTE = ['#1b1b1f', '#ffffff', '#e5484d', '#f76b15', '#ffc53d', '#46a758', '#3e9ef7', '#8e4ec6', '#d6409f', '#8d6e63'] as const
 export const BRUSH_SIZES = [4, 10, 24, 48] as const
 export const MAX_TEXT_LENGTH = 80
-export const MAX_NAME_LENGTH = 20
 export const MIN_PLAYERS = 2
 export const MAX_PLAYERS = 12
 
@@ -25,11 +27,7 @@ export type TaskKind = 'write' | 'draw' | 'guess'
 
 export type Phase = 'lobby' | 'playing' | 'reveal'
 
-export interface PlayerView {
-  id: string
-  name: string
-  connected: boolean
-  isHost: boolean
+export interface PlayerView extends BasePlayerView {
   submitted: boolean
 }
 
@@ -46,9 +44,7 @@ export interface RevealChain {
   entries: Entry[]
 }
 
-export interface RoomView {
-  code: string
-  youId: string
+export interface RoomView extends BaseRoomView {
   phase: Phase
   players: PlayerView[]
   step: number
@@ -66,7 +62,4 @@ export type ClientMessage =
   | { type: 'revealNext' }
   | { type: 'playAgain' }
 
-export type ServerMessage =
-  // `now` is the server's clock, so clients can count down to `deadline` without trusting their own.
-  | { type: 'state'; room: RoomView; token: string; now: number }
-  | { type: 'error'; message: string }
+export type ServerMessage = BaseServerMessage<RoomView>

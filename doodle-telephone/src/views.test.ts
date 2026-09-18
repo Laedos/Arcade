@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, expect, it, vi } from 'vitest'
 import type { PlayerView, RoomView } from './protocol'
-import { formatSeconds, homeView, type RoomActions, roomView, type TurnSlots } from './views'
+import { type RoomActions, roomView, type TurnSlots } from './views'
 
 const player = (id: string, extra: Partial<PlayerView> = {}): PlayerView => ({ id, name: id.toUpperCase(), connected: true, isHost: false, submitted: false, ...extra })
 
@@ -21,7 +21,7 @@ function room(extra: Partial<RoomView> = {}): RoomView {
 }
 
 function actions(): RoomActions {
-  return { start: vi.fn(), copyLink: vi.fn(), submitText: vi.fn(), submitDrawing: vi.fn(), revealNext: vi.fn(), playAgain: vi.fn() }
+  return { submitText: vi.fn(), submitDrawing: vi.fn(), revealNext: vi.fn(), playAgain: vi.fn() }
 }
 
 function slots(): TurnSlots {
@@ -32,50 +32,6 @@ function slots(): TurnSlots {
 
 const buttons = (el: HTMLElement) => [...el.querySelectorAll('button')].map((b) => b.textContent)
 const click = (el: HTMLElement, label: string) => [...el.querySelectorAll('button')].find((b) => b.textContent === label)!.click()
-
-describe('homeView', () => {
-  it('creates or joins with the typed name and an upper-cased code', () => {
-    const create = vi.fn()
-    const join = vi.fn()
-    const view = homeView({ name: 'Ana', code: '' }, false, { create, join })
-    view.querySelector<HTMLInputElement>('#code')!.value = ' wxyz '
-    click(view, 'Create a room')
-    click(view, 'Join')
-    expect(create).toHaveBeenCalledWith('Ana')
-    expect(join).toHaveBeenCalledWith('Ana', 'WXYZ')
-  })
-
-  it('disables both buttons while busy and pre-fills a code from an invite link', () => {
-    const view = homeView({ name: '', code: 'WXYZ' }, true, { create: vi.fn(), join: vi.fn() })
-    expect([...view.querySelectorAll('button')].every((b) => b.disabled)).toBe(true)
-    expect(view.querySelector<HTMLInputElement>('#code')!.value).toBe('WXYZ')
-  })
-})
-
-describe('lobby', () => {
-  it('shows the code and players, and lets the host start', () => {
-    const a = actions()
-    const view = roomView(room(), slots(), a)
-    expect(view.querySelector('.room-code')!.textContent).toBe('ABCD')
-    expect(view.querySelector('.players')!.textContent).toBe('AyouhostB')
-    click(view, 'Start game')
-    click(view, 'Copy invite link')
-    expect(a.start).toHaveBeenCalled()
-    expect(a.copyLink).toHaveBeenCalled()
-  })
-
-  it('keeps Start disabled until there are enough players', () => {
-    const view = roomView(room({ players: [player('a', { isHost: true })] }), slots(), actions())
-    expect(view.querySelector<HTMLButtonElement>('.primary')!.disabled).toBe(true)
-    expect(view.textContent).toContain('Need at least 2 players.')
-  })
-
-  it('tells everyone else to wait for the host', () => {
-    const view = roomView(room({ youId: 'b' }), slots(), actions())
-    expect(buttons(view)).toEqual(['Copy invite link'])
-    expect(view.textContent).toContain('Waiting for the host to start')
-  })
-})
 
 describe('playing', () => {
   it('asks for a prompt on the first turn and submits the typed text', () => {
@@ -163,10 +119,20 @@ describe('reveal', () => {
   })
 })
 
-describe('formatSeconds', () => {
-  it('rounds up to whole seconds and never goes negative', () => {
-    expect(formatSeconds(75_000)).toBe('1:15')
-    expect(formatSeconds(4_100)).toBe('0:05')
-    expect(formatSeconds(-10)).toBe('0:00')
+describe('reveal entry classes', () => {
+  it('never reuse the draw screen’s .prompt and .drawing classes on a whole entry', () => {
+    const chains = [
+      {
+        ownerId: 'a',
+        entries: [
+          { kind: 'prompt' as const, authorId: 'a', text: 'a cat' },
+          { kind: 'drawing' as const, authorId: 'b', strokes: [] },
+        ],
+      },
+    ]
+    const view = roomView(room({ phase: 'reveal', reveal: { chains, chain: 0, entry: 1, finished: false } }), slots(), actions())
+    const entries = [...view.querySelectorAll('li')]
+    expect(entries.map((li) => li.className)).toEqual(['entry entry-prompt', 'entry entry-drawing'])
+    expect(view.querySelectorAll('li.prompt, li.drawing')).toHaveLength(0)
   })
 })

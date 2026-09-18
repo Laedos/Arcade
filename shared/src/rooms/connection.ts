@@ -1,12 +1,12 @@
-import type { ClientMessage, RoomView, ServerMessage } from './protocol'
+import type { BaseRoomView, ServerMessage } from './protocol'
 
 const RETRY_DELAYS_MS = [500, 1000, 2000, 4000, 8000]
 // Close codes the room server uses when it refuses or replaces a connection. Retrying those
 // would just be refused again.
 const FINAL_CLOSE_CODES = new Set([4000, 4004])
 
-export interface ConnectionEvents {
-  onState(room: RoomView, serverOffsetMs: number): void
+export interface ConnectionEvents<V extends BaseRoomView> {
+  onState(room: V, serverOffsetMs: number): void
   onError(message: string): void
   onStatus(status: 'connecting' | 'connected' | 'reconnecting' | 'closed', reason?: string): void
 }
@@ -22,30 +22,40 @@ export function httpToWs(base: string): string {
   return base.replace(/^http/, 'ws')
 }
 
-export async function createRoom(apiBase: string, fetcher: typeof fetch = fetch): Promise<string> {
-  const response = await fetcher(`${apiBase}/doodle/rooms`, { method: 'POST' })
+export async function createRoom(apiBase: string, game: string, fetcher: typeof fetch = fetch): Promise<string> {
+  const response = await fetcher(`${apiBase}/${game}/rooms`, { method: 'POST' })
   if (!response.ok) throw new Error('Could not create a room. Try again in a moment.')
   const body = (await response.json()) as { code: string }
   return body.code
 }
 
-// Keeps one live connection to a room, reconnecting with the player's token (so they get their
+// Keeps one live connection to a game's room, reconnecting with the player's token (so they get their
 // seat back) until the server says no or the page gives up.
-export class RoomConnection {
+export class RoomConnection<V extends BaseRoomView, C = unknown> {
   private socket: WebSocket | null = null
   private attempt = 0
   private stopped = false
   private retryTimer: ReturnType<typeof setTimeout> | null = null
 
   private readonly apiBase: string
+  private readonly game: string
   private readonly code: string
   private readonly name: string
   private readonly tokens: TokenStore
-  private readonly events: ConnectionEvents
+  private readonly events: ConnectionEvents<V>
   private readonly openSocket: SocketFactory
 
-  constructor(apiBase: string, code: string, name: string, tokens: TokenStore, events: ConnectionEvents, openSocket: SocketFactory = (url) => new WebSocket(url)) {
+  constructor(
+    apiBase: string,
+    game: string,
+    code: string,
+    name: string,
+    tokens: TokenStore,
+    events: ConnectionEvents<V>,
+    openSocket: SocketFactory = (url) => new WebSocket(url),
+  ) {
     this.apiBase = apiBase
+    this.game = game
     this.code = code
     this.name = name
     this.tokens = tokens
@@ -59,7 +69,7 @@ export class RoomConnection {
     const params = new URLSearchParams({ name: this.name })
     const token = this.tokens.get(this.code)
     if (token) params.set('token', token)
-    const socket = this.openSocket(`${httpToWs(this.apiBase)}/doodle/rooms/${this.code}/ws?${params}`)
+    const socket = this.openSocket(`${httpToWs(this.apiBase)}/${this.game}/rooms/${this.code}/ws?${params}`)
     this.socket = socket
 
     socket.addEventListener('open', () => {
@@ -70,7 +80,7 @@ export class RoomConnection {
     socket.addEventListener('close', (event) => this.closed(socket, event.code, event.reason))
   }
 
-  send(message: ClientMessage): void {
+  send(message: C): void {
     if (this.socket?.readyState === WebSocket.OPEN) this.socket.send(JSON.stringify(message))
   }
 
@@ -81,9 +91,9 @@ export class RoomConnection {
   }
 
   private receive(data: unknown): void {
-    let message: ServerMessage
+    let message: ServerMessage<V>
     try {
-      message = JSON.parse(String(data)) as ServerMessage
+      message = JSON.parse(String(data)) as ServerMessage<V>
     } catch {
       return
     }
@@ -108,8 +118,8 @@ export class RoomConnection {
   }
 }
 
-export function localTokenStore(storage: Pick<Storage, 'getItem' | 'setItem'> | null = safeLocalStorage()): TokenStore {
-  const key = (code: string) => `doodle-telephone.token.${code}`
+export function localTokenStore(game: string, storage: Pick<Storage, 'getItem' | 'setItem'> | null = safeLocalStorage()): TokenStore {
+  const key = (code: string) => `${game}.token.${code}`
   return {
     get: (code) => {
       try {
