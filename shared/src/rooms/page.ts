@@ -1,12 +1,12 @@
 import { ONLINE, ROOMS_API } from './config'
 import { createRoom, localTokenStore, RoomConnection } from './connection'
-import { button, formatSeconds, h } from './dom'
+import { button, formatSeconds, h, replaceKeepingFocus } from './dom'
 import { homeView, lobbyView } from './lobby'
 import { type PreviewStep, previewBar } from './preview'
 import { type BaseRoomView, ROOM_CODE_PATTERN } from './protocol'
 
 export interface RoomContext<C> {
-  send(message: C): void
+  send(message: C): boolean
   // The server's clock, for counting down to deadlines.
   serverNow(): number
 }
@@ -51,7 +51,7 @@ export function startRoomPage<V extends BaseRoomView & { deadline?: number | nul
   let connection: RoomConnection<V, C | { type: 'start' }> | null = null
   let room: V | null = null
   let serverOffset = 0
-  const ctx: RoomContext<C> = { send: (message) => connection?.send(message), serverNow: () => Date.now() + serverOffset }
+  const ctx: RoomContext<C> = { send: (message) => connection?.send(message) ?? false, serverNow: () => Date.now() + serverOffset }
 
   const showError = (message: string) => {
     errorEl.textContent = message
@@ -120,7 +120,7 @@ export function startRoomPage<V extends BaseRoomView & { deadline?: number | nul
     if (!room) return
     const screen =
       room.phase === 'lobby' ? lobbyView(room, options.limits, { start: () => connection?.send({ type: 'start' }), copyLink }) : options.render(room, ctx)
-    app.replaceChildren(screen, button('Leave room', () => leave(), 'leave'))
+    replaceKeepingFocus(app, screen, button('Leave room', () => leave(), 'leave'))
     options.afterRender?.(room, ctx)
     tick()
   }

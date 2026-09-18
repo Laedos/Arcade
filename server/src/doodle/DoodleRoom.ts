@@ -1,7 +1,7 @@
 import { DurableObject } from 'cloudflare:workers'
 import type { ServerMessage } from '../../../doodle-telephone/src/protocol'
 import { parseClientMessage } from '../http'
-import { createRoom, disconnect, GRACE_MS, join, playAgain, type Result, revealNext, type Room, start, submit, tick, viewFor } from './room'
+import { createRoom, disconnect, join, nextWakeAt, playAgain, type Result, revealNext, type Room, start, submit, tick, viewFor } from './room'
 
 const ids = { newId: () => crypto.randomUUID(), newToken: () => crypto.randomUUID() }
 
@@ -103,12 +103,9 @@ export class DoodleRoom extends DurableObject {
   }
 
   private async scheduleAlarm(): Promise<void> {
-    const deadline = this.room?.phase === 'playing' ? this.room.deadline : null
-    if (deadline === null || deadline === undefined) {
-      await this.ctx.storage.deleteAlarm()
-    } else {
-      await this.ctx.storage.setAlarm(deadline + GRACE_MS)
-    }
+    const wakeAt = this.room ? nextWakeAt(this.room, Date.now()) : null
+    if (wakeAt === null) await this.ctx.storage.deleteAlarm()
+    else await this.ctx.storage.setAlarm(wakeAt)
   }
 }
 

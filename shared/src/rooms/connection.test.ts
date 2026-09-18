@@ -102,9 +102,9 @@ describe('RoomConnection', () => {
   it('sends only while open', () => {
     const { connection, sockets } = setup()
     connection.connect()
-    connection.send({ type: 'start' })
+    expect(connection.send({ type: 'start' })).toBe(false)
     sockets[0].open()
-    connection.send({ type: 'start' })
+    expect(connection.send({ type: 'start' })).toBe(true)
     expect(sockets[0].sent).toEqual(['{"type":"start"}'])
   })
 

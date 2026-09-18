@@ -135,10 +135,13 @@ startRoomPage<RoomView, ClientMessage>({
   tick(room, ctx) {
     if (room.phase !== 'playing' || room.deadline === null || !room.task || autoSubmitted) return
     if (room.deadline - ctx.serverNow() > 0) return
-    autoSubmitted = true
-    const actions = actionsFor(room, ctx)
-    if (room.task.kind === 'draw') actions.submitDrawing()
-    else actions.submitText(slots?.text.value ?? '')
+    // Only counts once it actually went out: mid-reconnect the send fails, and the next tick tries
+    // again, still inside the server's grace period.
+    const sent =
+      room.task.kind === 'draw'
+        ? ctx.send({ type: 'submit', step: room.step, strokes: pad?.strokes ?? [] })
+        : ctx.send({ type: 'submit', step: room.step, text: slots?.text.value ?? '' })
+    if (sent) autoSubmitted = true
   },
   preview: () => [
     { label: 'Lobby', render: () => lobbyView(sampleLobby, LIMITS, { start: () => {}, copyLink: () => {} }) },

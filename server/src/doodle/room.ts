@@ -17,6 +17,9 @@ export const TASK_SECONDS: Record<TaskKind, number> = { write: 45, draw: 75, gue
 // Clients submit whatever they have when their own countdown hits zero; the server waits this
 // much longer before filling in blanks, so a slow connection doesn't lose a finished drawing.
 export const GRACE_MS = 3000
+// A player who drops mid-turn keeps their turn this long before the others stop waiting for them,
+// so a refresh or a network blip doesn't throw their work away.
+export const REJOIN_GRACE_MS = 15000
 const MAX_STROKES = 1500
 const MAX_POINTS = 30000
 const BLANK_TEXT = '…'
@@ -26,6 +29,7 @@ export interface Player {
   name: string
   token: string
   connected: boolean
+  disconnectedAt: number | null
 }
 
 export interface Room {
@@ -71,20 +75,22 @@ export function join(room: Room, name: string, token: string | null, ids: IdSour
   const returning = token ? room.players.find((p) => p.token === token) : undefined
   if (returning) {
     returning.connected = true
+    returning.disconnectedAt = null
     ensureHost(room)
     return ok(returning)
   }
   if (room.phase !== 'lobby') return fail('This game has already started.')
   if (room.players.length >= MAX_PLAYERS) return fail('This room is full.')
 
-  const player = { id: ids.newId(), name: uniqueName(room, name), token: ids.newToken(), connected: true }
+  const player = { id: ids.newId(), name: uniqueName(room, name), token: ids.newToken(), connected: true, disconnectedAt: null }
   room.players.push(player)
   ensureHost(room)
   return ok(player)
 }
 
-// In the lobby a player who drops simply leaves. Mid-game their seat is kept so they can
-// rejoin, and their turns are filled with blanks when the clock runs out.
+// In the lobby a player who drops simply leaves. Mid-game their seat is kept so they can rejoin:
+// the game waits for them for REJOIN_GRACE_MS (and never past the turn's clock), then carries on
+// without them, filling their turns with blanks.
 export function disconnect(room: Room, playerId: string, now: number): void {
   const player = room.players.find((p) => p.id === playerId)
   if (!player) return
@@ -92,10 +98,10 @@ export function disconnect(room: Room, playerId: string, now: number): void {
     room.players = room.players.filter((p) => p.id !== playerId)
   } else {
     player.connected = false
+    player.disconnectedAt = now
   }
   if (room.hostId === playerId) room.hostId = null
   ensureHost(room)
-  if (room.phase === 'playing') advanceIfEveryoneDone(room, now)
 }
 
 export function start(room: Room, playerId: string, now: number): Result {
@@ -162,12 +168,28 @@ export function submit(room: Room, playerId: string, step: number, content: { te
   return ok(undefined)
 }
 
-// Called on the room's alarm. Returns whether anything changed.
+// Called on the room's alarm (see nextWakeAt). Returns whether anything changed.
 export function tick(room: Room, now: number): boolean {
-  if (room.phase !== 'playing' || room.deadline === null || now < room.deadline + GRACE_MS) return false
-  fillMissing(room)
-  advance(room, now)
-  return true
+  if (room.phase !== 'playing' || room.deadline === null) return false
+  if (now >= room.deadline + GRACE_MS) {
+    fillMissing(room)
+    advance(room, now)
+    return true
+  }
+  const step = room.step
+  advanceIfEveryoneDone(room, now)
+  return room.step !== step
+}
+
+// When the room next needs a tick: the turn's deadline (plus grace), or sooner if a dropped player's
+// rejoin window runs out first and they are the only one still holding the turn up.
+export function nextWakeAt(room: Room, now: number): number | null {
+  if (room.phase !== 'playing' || room.deadline === null) return null
+  const rejoinEnds = room.players
+    .filter((p) => !p.connected && p.disconnectedAt !== null && room.seating.includes(p.id) && !room.submitted.includes(p.id))
+    .map((p) => p.disconnectedAt! + REJOIN_GRACE_MS)
+    .filter((end) => end > now)
+  return Math.min(room.deadline + GRACE_MS, ...rejoinEnds)
 }
 
 export function revealNext(room: Room, playerId: string): Result {
@@ -226,8 +248,14 @@ function revealedChains(room: Room) {
   return room.chains.slice(0, chain + 1).map((c, i) => ({ ownerId: c.ownerId, entries: i < chain ? c.entries : c.entries.slice(0, entry + 1) }))
 }
 
+function isStillExpected(room: Room, playerId: string, now: number): boolean {
+  const player = room.players.find((p) => p.id === playerId)
+  if (!player) return false
+  return player.connected || (player.disconnectedAt !== null && now - player.disconnectedAt < REJOIN_GRACE_MS)
+}
+
 function advanceIfEveryoneDone(room: Room, now: number): void {
-  const waitingOn = room.seating.filter((id) => !room.submitted.includes(id) && room.players.some((p) => p.id === id && p.connected))
+  const waitingOn = room.seating.filter((id) => !room.submitted.includes(id) && isStillExpected(room, id, now))
   if (waitingOn.length > 0) return
   fillMissing(room)
   advance(room, now)

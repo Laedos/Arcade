@@ -80,8 +80,12 @@ export class RoomConnection<V extends BaseRoomView, C = unknown> {
     socket.addEventListener('close', (event) => this.closed(socket, event.code, event.reason))
   }
 
-  send(message: C): void {
-    if (this.socket?.readyState === WebSocket.OPEN) this.socket.send(JSON.stringify(message))
+  // False when there's no open connection right now (e.g. mid-reconnect), so callers that must get
+  // a message through can try again.
+  send(message: C): boolean {
+    if (this.socket?.readyState !== WebSocket.OPEN) return false
+    this.socket.send(JSON.stringify(message))
+    return true
   }
 
   close(): void {

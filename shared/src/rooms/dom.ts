@@ -27,3 +27,15 @@ export function formatSeconds(msLeft: number): string {
   const seconds = Math.max(0, Math.ceil(msLeft / 1000))
   return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`
 }
+
+// Swaps a container's content without dropping the player's place: if the focused element (a
+// kept answer box, say) is still in the new content, it gets focus and its cursor back.
+export function replaceKeepingFocus(container: HTMLElement, ...content: Node[]): void {
+  const active = document.activeElement
+  const input = active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement ? active : null
+  const selection = input ? [input.selectionStart, input.selectionEnd] : null
+  container.replaceChildren(...content)
+  if (!(active instanceof HTMLElement) || active === document.body || !container.contains(active)) return
+  active.focus()
+  if (input && selection) input.setSelectionRange(selection[0], selection[1])
+}

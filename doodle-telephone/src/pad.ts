@@ -47,6 +47,14 @@ export class DrawingPad {
 
   private move(event: PointerEvent): void {
     if (!this.current) return
+    // A redraw (another player submitting) can detach the canvas mid-stroke and drop its pointer
+    // capture, so the pointerup might land elsewhere. No button held means the stroke is over;
+    // otherwise take the pointer back and keep drawing.
+    if (event.buttons === 0) {
+      this.end()
+      return
+    }
+    if (!this.canvas.hasPointerCapture(event.pointerId)) this.canvas.setPointerCapture(event.pointerId)
     for (const e of event.getCoalescedEvents?.() ?? [event]) this.addPoint(e)
   }
 

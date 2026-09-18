@@ -7,6 +7,8 @@ import {
   createRoom,
   disconnect,
   GRACE_MS,
+  nextWakeAt,
+  REJOIN_GRACE_MS,
   type IdSource,
   join,
   playAgain,
@@ -114,13 +116,56 @@ describe('leaving', () => {
     expect(room.hostId).toBe(players[1])
   })
 
-  it('moves the game on when the only player still to submit leaves', () => {
+  it('waits for the last player still working when they drop, instead of blanking their turn', () => {
     const { room, players } = started(3)
     submit(room, players[0], 0, { text: 'a' }, 0)
     submit(room, players[1], 0, { text: 'b' }, 0)
-    disconnect(room, players[2], 0)
+    disconnect(room, players[2], 1000)
+    expect(room.step).toBe(0)
+    expect(nextWakeAt(room, 1000)).toBe(1000 + REJOIN_GRACE_MS)
+
+    // Back within the window: the turn is still theirs.
+    expect(join(room, '', 't3', ids()).ok).toBe(true)
+    expect(tick(room, 1000 + REJOIN_GRACE_MS)).toBe(false)
+    expect(submit(room, players[2], 0, { text: 'c' }, 2000).ok).toBe(true)
+    expect(room.chains[2].entries[0]).toEqual({ kind: 'prompt', authorId: players[2], text: 'c' })
+  })
+
+  it('carries on without a dropped player once their rejoin window closes', () => {
+    const { room, players } = started(3)
+    submit(room, players[0], 0, { text: 'a' }, 0)
+    submit(room, players[1], 0, { text: 'b' }, 0)
+    disconnect(room, players[2], 1000)
+    expect(tick(room, 1000 + REJOIN_GRACE_MS - 1)).toBe(false)
+    expect(tick(room, 1000 + REJOIN_GRACE_MS)).toBe(true)
     expect(room.step).toBe(1)
     expect(room.chains[2].entries[0]).toEqual({ kind: 'prompt', authorId: players[2], text: '…' })
+  })
+
+  it('does not let a long-gone player hold up the others', () => {
+    const { room, players } = started(3)
+    disconnect(room, players[2], 0)
+    submit(room, players[0], 0, { text: 'a' }, REJOIN_GRACE_MS)
+    submit(room, players[1], 0, { text: 'b' }, REJOIN_GRACE_MS)
+    expect(room.step).toBe(1)
+  })
+
+  it('wakes at the deadline, or at the end of a rejoin window still running, but never in the past', () => {
+    const { room, players } = started(3)
+    const deadline = room.deadline! + GRACE_MS
+    expect(nextWakeAt(room, 0)).toBe(deadline)
+    disconnect(room, players[2], 1000)
+    expect(nextWakeAt(room, 1000)).toBe(1000 + REJOIN_GRACE_MS)
+    expect(nextWakeAt(room, 1000 + REJOIN_GRACE_MS)).toBe(deadline)
+    expect(nextWakeAt(createRoom('ZZZZ'), 0)).toBeNull()
+  })
+
+  it('fills a rejoin window that outlasts the turn when the clock runs out', () => {
+    const { room, players } = started(2)
+    submit(room, players[0], 0, { text: 'a' }, 0)
+    disconnect(room, players[1], room.deadline! - 1000)
+    expect(tick(room, room.deadline! + GRACE_MS)).toBe(true)
+    expect(room.step).toBe(1)
   })
 
   it('ignores an unknown player', () => {
