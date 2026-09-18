@@ -5,17 +5,23 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && tsc -p server && vite build",
     "lint": "oxlint",
     "test": "vitest run",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dev:server": "wrangler dev -c server/wrangler.jsonc",
+    "deploy:server": "wrangler deploy -c server/wrangler.jsonc",
+    "smoke:server": "node server/scripts/smoke.mjs"
   },
   "devDependencies": {
-    "@types/node": "^26.6.1",
+    "@cloudflare/workers-types": "^5.20260918.1",
+    "@types/node": "^26.4.1",
     "@vitest/coverage-v8": "^4.1.11",
+    "jsdom": "^29.1.1",
     "oxlint": "^1.81.0",
     "typescript": "~7.0.2",
     "vite": "^8.2.0",
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.11",
+    "wrangler": "^4.134.0"
   }
 }

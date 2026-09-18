@@ -6,6 +6,8 @@ Small browser games, live at https://play.sbdevworks.com.
 - **Stacker**: drop the sliding block; the overhang gets cut off. Build as high as you can.
 - **Mirror Snake**: classic snake, but every fourth apple flips your controls.
 - **Lights Out**: each light flips itself and its neighbours. Turn them all off.
+- **Doodle Telephone** (multiplayer): write a prompt, draw what you get, guess what you see, then
+  watch every chain fall apart. 2 to 12 players, join with a room code.
 
 ```sh
 npm install

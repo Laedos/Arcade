@@ -11,7 +11,9 @@ what's specific to Arcade.
 
 ## Stack
 
-TypeScript + Vite, plain Canvas 2D / DOM, no framework and no runtime dependencies. One
+TypeScript + Vite, plain Canvas 2D / DOM, no framework and no runtime dependencies. Multiplayer games
+also have a Cloudflare Worker backend in `server/` (Durable Objects, TypeScript), the one part of
+Arcade not hosted on GitHub Pages; see Doodle Telephone below. One
 `package.json`, one Vitest run, one oxlint run and one multi-page Vite build for the whole
 collection. Games share tooling and a small `shared/src/` (best-score storage, page CSS), never
 game logic. Versions follow the web baseline in `CLAUDE-web.md`. `.npmrc` sets
@@ -29,6 +31,7 @@ Tenanza hit (npm 10 in CI is fine either way).
 - `vite.config.ts`: the build's page list (`rollupOptions.input`) and the test coverage config.
 - `tests/menu.test.ts`: keeps the menu cards, the build's page list and the game folders in sync,
   and checks every game links back to the menu.
+- `server/`: the multiplayer backend (own `tsconfig.json` for Workers types; the root one excludes it).
 - `public/CNAME`: the Pages custom domain.
 
 **Adding a game** takes three things, and the menu test fails until all three agree: a
@@ -87,6 +90,57 @@ The classic 5x5 puzzle: pressing a light flips it and its four neighbours.
 - It's DOM, not canvas: 25 real `<button>`s with `aria-pressed`, so it works with keyboard and
   screen readers.
 - Best score is the highest level solved (`lights-out.best`). Play resumes at the level after it.
+
+### Doodle Telephone (`doodle-telephone/` + `server/`), multiplayer
+
+A Gartic Phone-style party game for 2 to 12 players. Someone creates a room (4-letter code, no I
+or O) and friends join with the code and a nickname. There are no accounts. Everyone writes a
+prompt; then the chains pass one seat along each turn, alternating draw (75 s) and guess (30 s),
+until every chain has been through every player. The host then steps through the reveal, where
+each drawing replays stroke by stroke.
+
+- **Server** (`server/`): a Cloudflare Worker with one Durable Object per room
+  (`DoodleRoom`), deployed as `arcade-rooms` on the custom domain `rooms.sbdevworks.com`.
+  - `src/doodle/room.ts` holds all the rules as a plain state machine, fully tested.
+    `DoodleRoom.ts` is only wiring: sockets, a broadcast after every change, and an alarm at
+    each turn's deadline.
+  - `src/http.ts` covers room codes, the origin allow-list and message parsing.
+    `src/index.ts` routes `POST /doodle/rooms` (create) and `GET /doodle/rooms/:code/ws` (join).
+- **Server-authoritative.** Seat i works on chain `(i - step) mod N`. Clients hand in whatever
+  they have when their countdown hits zero. The server waits 3 more seconds (`GRACE_MS`), then
+  fills any missing entry with "…" or an empty drawing and moves on. It also moves on as soon as
+  every connected player has submitted. Countdowns use the server's clock (`now` in every state
+  message), not the device's.
+- **Rooms live in memory only, with no storage.** A room is gone once Cloudflare evicts the
+  object after everyone leaves, or on a deploy. Fine for a party game; don't deploy mid-party.
+  - In the lobby, a player who disconnects leaves.
+  - Mid-game their seat is kept; the page stores a per-room token in `localStorage`, so a refresh
+    rejoins the same seat.
+  - The same player in a second tab replaces the first connection (close code 4000). A refused
+    join closes with code 4004. The client doesn't retry either code.
+- **Untrusted input.** Every drawing is cleaned server-side: only palette colours and brush sizes
+  are kept, points are clamped to the 1000x1000 grid, and totals are capped at 1,500 strokes and
+  30,000 points. Text is capped at 80 characters, names at 20. The Worker only accepts the
+  origins in `ALLOWED_ORIGINS` (`server/wrangler.jsonc`).
+- **Wire format:** `doodle-telephone/src/protocol.ts`, imported by both sides.
+- **Page code:**
+  - `views.ts`: DOM screens, tested in jsdom.
+  - `connection.ts`: WebSocket with reconnect backoff, tested with a fake socket.
+  - `strokes.ts`: stroke maths and painting, tested with a recording context.
+  - `pad.ts` (canvas input) and `main.ts` (glue) are left out of coverage.
+  - A half-finished drawing or guess survives re-renders, because `main.ts` owns those elements
+    per turn and slots them into each render.
+- **Server URL:** set by `VITE_ROOMS_URL`. It defaults to `https://rooms.sbdevworks.com`;
+  `.env.development` points it at `http://localhost:8787`.
+
+**Running it locally:** `npm run dev:server` (Wrangler, port 8787) plus `npm run dev`.
+`npm run smoke:server` plays a whole 3-player game against the running server, including a
+mid-game rejoin, a foreign origin, and an unknown room code. It isn't in CI.
+
+**Deploying the server:** `npm run deploy:server`. This needs `npx wrangler login` once on the
+machine, and it isn't in Jenkins yet: automating it needs a Cloudflare API token stored in
+Jenkins. The Worker has to be deployed before a page change that depends on a protocol change
+goes out.
 
 ### Not built yet, any game
 

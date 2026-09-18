@@ -1,0 +1,15 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "arcade-rooms",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-01",
+  "durable_objects": {
+    "bindings": [{ "name": "DOODLE_ROOMS", "class_name": "DoodleRoom" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["DoodleRoom"] }],
+  "routes": [{ "pattern": "rooms.sbdevworks.com", "custom_domain": true }],
+  "vars": {
+    "ALLOWED_ORIGINS": "https://play.sbdevworks.com,http://localhost:5173,http://localhost:4173"
+  },
+  "observability": { "enabled": true }
+}

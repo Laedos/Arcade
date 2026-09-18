@@ -12,6 +12,7 @@ export default defineConfig({
         stacker: resolve(import.meta.dirname, 'stacker/index.html'),
         snake: resolve(import.meta.dirname, 'snake/index.html'),
         'lights-out': resolve(import.meta.dirname, 'lights-out/index.html'),
+        'doodle-telephone': resolve(import.meta.dirname, 'doodle-telephone/index.html'),
       },
     },
   },
@@ -20,7 +21,7 @@ export default defineConfig({
     coverage: {
       reporter: ['text', 'lcov'],
       include: ['*/src/**/*.ts'],
-      exclude: ['**/*.test.ts', '*/src/main.ts', '*/src/render.ts'],
+      exclude: ['**/*.test.ts', '*/src/main.ts', '*/src/render.ts', 'server/src/index.ts', 'server/src/doodle/DoodleRoom.ts', '*/src/protocol.ts', 'doodle-telephone/src/pad.ts'],
     },
   },
 })
