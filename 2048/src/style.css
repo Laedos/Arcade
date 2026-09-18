@@ -91,15 +91,15 @@ h1 {
 
 .v2 { background: #efe4d6; }
 .v4 { background: #ece0c8; }
-.v8 { background: #f2b179; color: #fff8ef; }
-.v16 { background: #f59563; color: #fff8ef; }
-.v32 { background: #f67c5f; color: #fff8ef; }
-.v64 { background: #f65e3b; color: #fff8ef; }
-.v128 { background: #edcf72; color: #fff8ef; font-size: clamp(18px, 6vw, 30px); }
-.v256 { background: #edcc61; color: #fff8ef; font-size: clamp(18px, 6vw, 30px); }
-.v512 { background: #edc850; color: #fff8ef; font-size: clamp(18px, 6vw, 30px); }
-.v1024 { background: #edc53f; color: #fff8ef; font-size: clamp(15px, 5vw, 26px); }
-.v2048 { background: #edc22e; color: #fff8ef; font-size: clamp(15px, 5vw, 26px); box-shadow: 0 0 20px rgba(237, 194, 46, 0.6); }
+.v8 { background: #f2b179; color: #2b221c; }
+.v16 { background: #f59563; color: #2b221c; }
+.v32 { background: #f67c5f; color: #2b221c; }
+.v64 { background: #f65e3b; color: #2b221c; }
+.v128 { background: #edcf72; color: #2b221c; font-size: clamp(18px, 6vw, 30px); }
+.v256 { background: #edcc61; color: #2b221c; font-size: clamp(18px, 6vw, 30px); }
+.v512 { background: #edc850; color: #2b221c; font-size: clamp(18px, 6vw, 30px); }
+.v1024 { background: #edc53f; color: #2b221c; font-size: clamp(15px, 5vw, 26px); }
+.v2048 { background: #edc22e; color: #2b221c; font-size: clamp(15px, 5vw, 26px); box-shadow: 0 0 20px rgba(237, 194, 46, 0.6); }
 .v4096 { background: #3c3a32; color: #fff8ef; font-size: clamp(15px, 5vw, 26px); }
 
 .tile.new {
