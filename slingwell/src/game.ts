@@ -203,7 +203,7 @@ function followCamera(state: GameState, dt: number): void {
 }
 
 function spawnAhead(state: GameState): void {
-  let top = state.planets.reduce((highest, p) => (p.y < highest.y ? p : highest))
+  let top = state.planets.reduce((highest, p) => (p.y < highest.y ? p : highest), state.planets[0])
   while (top.y > state.cameraY - VIEW_HEIGHT * 0.5) {
     top = nextPlanet(state, top)
     state.planets.push(top)

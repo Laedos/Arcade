@@ -67,9 +67,6 @@ h1 {
   color: inherit;
   text-decoration: none;
   overflow: hidden;
-}
-
-.card {
   transition: background 150ms, border-color 150ms, transform 150ms;
 }
 

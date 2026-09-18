@@ -95,7 +95,7 @@ export function step(state: StackerState, dt: number): void {
 export function drop(state: StackerState): DropResult {
   if (state.phase === 'over') return 'ignored'
 
-  const top = state.stack[state.stack.length - 1]
+  const top = state.stack.at(-1)!
   const moving = state.moving
   const level = state.stack.length
   let placed: Block

@@ -67,7 +67,7 @@ export function tickSeconds(score: number): number {
 export function turn(state: SnakeState, input: Dir): void {
   if (state.phase === 'over') return
   const wanted = isMirrored(state) ? OPPOSITE[input] : input
-  const previous = state.queue[state.queue.length - 1] ?? state.dir
+  const previous = state.queue.at(-1) ?? state.dir
   if (state.phase === 'ready') state.phase = 'playing'
   if (wanted === previous || wanted === OPPOSITE[previous] || state.queue.length >= MAX_QUEUED_TURNS) return
   state.queue.push(wanted)

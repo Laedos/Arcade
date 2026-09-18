@@ -11,12 +11,12 @@
     <title>Lights Out</title>
   </head>
   <body>
-    <a class="back" href="/" aria-label="Back to all games">← Games</a>
+    <a class="back" href="/"><span aria-hidden="true">←</span> Games</a>
     <main>
       <h1>Lights Out</h1>
       <p class="hint">Each light flips itself and its neighbours. Turn every light off.</p>
       <p class="stats"><span id="level"></span> · <span id="moves"></span> · <span id="best"></span></p>
-      <div id="board" class="board" role="group" aria-label="Lights"></div>
+      <fieldset id="board" class="board"><legend class="sr-only">Lights</legend></fieldset>
       <p id="result" class="result" aria-live="polite"></p>
       <div class="actions">
         <button type="button" id="next" class="primary" hidden>Next level</button>

@@ -48,6 +48,10 @@ h1 {
 }
 
 .board {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 10px;

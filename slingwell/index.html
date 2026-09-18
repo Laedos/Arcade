@@ -11,8 +11,10 @@
     <title>Slingwell</title>
   </head>
   <body>
-    <a class="back" href="/" aria-label="Back to all games">← Games</a>
-    <canvas id="game" aria-label="Slingwell game. Press Space, Enter, or tap to let go of the orbit." role="img"></canvas>
+    <a class="back" href="/"><span aria-hidden="true">←</span> Games</a>
+    <h1 class="sr-only">Slingwell</h1>
+    <p class="sr-only">You circle a planet. Press Space, Enter, or tap to let go and fly to the next orbit.</p>
+    <canvas id="game" aria-hidden="true"></canvas>
     <p id="status" class="sr-only" aria-live="polite"></p>
     <script type="module" src="./src/main.ts"></script>
   </body>

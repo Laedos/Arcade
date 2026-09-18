@@ -44,7 +44,7 @@ export function createLevel(level: number, rng: () => number = Math.random): Lig
   let board: boolean[]
   do {
     const cells = Array.from({ length: SIZE * SIZE }, (_, i) => i)
-    board = Array<boolean>(SIZE * SIZE).fill(false)
+    board = new Array<boolean>(SIZE * SIZE).fill(false)
     for (let i = 0; i < count; i++) {
       const pick = i + Math.floor(rng() * (cells.length - i))
       ;[cells[i], cells[pick]] = [cells[pick], cells[i]]

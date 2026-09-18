@@ -58,6 +58,11 @@ window.addEventListener('keydown', (event) => {
   }
 })
 
+function swipeDirection(dx: number, dy: number): Dir {
+  if (Math.abs(dx) > Math.abs(dy)) return dx > 0 ? 'right' : 'left'
+  return dy > 0 ? 'down' : 'up'
+}
+
 let swipeStart: { x: number; y: number } | null = null
 canvas.addEventListener('pointerdown', (event) => {
   event.preventDefault()
@@ -69,7 +74,7 @@ canvas.addEventListener('pointermove', (event) => {
   const dx = event.clientX - swipeStart.x
   const dy = event.clientY - swipeStart.y
   if (Math.max(Math.abs(dx), Math.abs(dy)) < SWIPE_MIN_PX) return
-  turn(state, Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : dy > 0 ? 'down' : 'up')
+  turn(state, swipeDirection(dx, dy))
   // Chain swipes without lifting the finger: measure the next one from here.
   swipeStart = { x: event.clientX, y: event.clientY }
 })

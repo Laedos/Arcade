@@ -155,7 +155,7 @@ function banner(ctx: CanvasRenderingContext2D, view: Viewport, title: string, su
 }
 
 function hash(n: number): number {
-  let h = n | 0
+  let h = Math.trunc(n)
   h = Math.imul(h ^ (h >>> 16), 0x45d9f3b)
   h = Math.imul(h ^ (h >>> 16), 0x45d9f3b)
   return (h ^ (h >>> 16)) >>> 0

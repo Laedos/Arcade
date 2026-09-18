@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createLevel, isSolved, press, pressCell, scrambleSize, SIZE } from './game'
 
-const off = () => Array<boolean>(SIZE * SIZE).fill(false)
+const off = () => new Array<boolean>(SIZE * SIZE).fill(false)
 const lit = (board: boolean[]) => board.flatMap((on, i) => (on ? [i] : []))
 
 // One of the 5x5 board's "quiet" patterns: pressing all of these cells changes nothing.
