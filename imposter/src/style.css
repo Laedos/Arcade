@@ -1,0 +1,114 @@
+:root {
+  --bg: #1f1024;
+  --bg-glow: #4a1f52;
+  --panel: #2c1733;
+  --field: #1a0d1f;
+  --line: #4d2a57;
+  --muted: #d0b8d8;
+  --accent: #ff8fc8;
+  --on-accent: #22061a;
+  --warm: #ffd978;
+}
+
+.role {
+  padding: 16px;
+  border: 2px solid var(--accent);
+  border-radius: 14px;
+  background: var(--field);
+  text-align: center;
+}
+
+.role.imposter {
+  border-color: var(--warm);
+  border-style: dashed;
+}
+
+.role-label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.role-word {
+  margin: 6px 0 0;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.imposter .role-word {
+  font-size: 22px;
+  color: var(--warm);
+}
+
+.clues,
+.tally {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.clues li,
+.tally li {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--field);
+}
+
+.clues li.turn {
+  outline: 2px solid var(--accent);
+}
+
+.clues .name,
+.tally .name {
+  flex: 1;
+}
+
+.clue {
+  font-weight: 700;
+}
+
+.ballot {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+}
+
+.suspect {
+  border-radius: 12px;
+  text-align: left;
+}
+
+.suspect[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+  opacity: 1;
+}
+
+.reveal-word {
+  margin: 0;
+  font-size: 18px;
+}
+
+.reveal-word strong {
+  color: var(--accent);
+  font-size: 24px;
+}
+
+.tally li.imposter {
+  outline: 2px solid var(--warm);
+}
+
+.votes {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}

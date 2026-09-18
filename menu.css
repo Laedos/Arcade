@@ -320,3 +320,41 @@ h1 {
 .paddle {
   fill: var(--accent);
 }
+
+.q-card { fill: #1d2448; stroke: rgba(160, 180, 255, 0.45); }
+.q-a { fill: #e5484d; }
+.q-b { fill: #3e9ef7; }
+.q-c { fill: #f5a524; }
+.q-d { fill: #46a758; }
+
+.q-text {
+  fill: var(--text);
+  font: 700 16px "Space Grotesk", system-ui, sans-serif;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.q-text.small {
+  font-size: 14px;
+}
+
+.crew { fill: #5cc8ff; }
+.crew.odd { fill: #ff8fc8; }
+
+.clue-lines {
+  stroke: rgba(238, 241, 255, 0.4);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.rps {
+  font-size: 34px;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.vs-text {
+  fill: var(--muted);
+  font: 700 14px "Space Grotesk", system-ui, sans-serif;
+  text-anchor: middle;
+}

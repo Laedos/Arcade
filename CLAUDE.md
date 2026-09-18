@@ -42,6 +42,40 @@ Each game keeps its rules in `src/game.ts`: plain state, no DOM access, fully un
 `main.ts` (input, loop, DOM) and, for canvas games, `render.ts` (drawing) stay thin and are left
 out of coverage.
 
+## Online games: the shared room kit and preview mode
+
+Every online game (the Multiplayer shelf, except Four in a Row) is built on `shared/src/rooms/`:
+
+- `protocol.ts`: what every room has, `BaseRoomView` (code, you, phase, players), and the
+  `state`/`error` server messages. Each game's own `protocol.ts` extends it.
+- `connection.ts`: one WebSocket per room, keyed by game slug (`/<slug>/rooms/<code>/ws`). It
+  reconnects with backoff and keeps a per-game, per-room seat token in `localStorage`.
+- `lobby.ts`: the home screen (name, then create or join by code) and the lobby (code, invite
+  link, players, Start for the host).
+- `page.ts`: `startRoomPage()` wires the whole page: create/join, reconnect, leave, errors, the
+  lobby, a countdown in any `#timer` element (using the server's clock), and preview mode. A game
+  only supplies `render` for its phases after the lobby, plus optional `afterRender`/`tick`
+  hooks.
+- `rooms.css`: the shared look. A game sets the colour variables and styles its own screens.
+- `config.ts`: `ROOMS_API` (`VITE_ROOMS_URL`) and `ONLINE` (`VITE_ROOMS_ONLINE === 'true'`).
+
+**`ONLINE` is off in production**, because the room server has never been deployed. While it's
+off, a game's home screen says so and offers **preview mode** instead of room create/join.
+
+- Preview mode is a bar of buttons that steps through that game's sample states
+  (`<game>/src/fixtures.ts`). Every action inside it does nothing.
+- `?preview` or `?preview=N` opens it directly at screen N, which is handy for sharing one
+  screen.
+- `.env.development` sets `VITE_ROOMS_ONLINE=true` for local play against `npm run dev:server`.
+- Going live means deploying the server, then building with `VITE_ROOMS_ONLINE=true`, for
+  example via a `.env.production`.
+
+**Only Doodle Telephone has a server side.** Quiz Night, Imposter and Rock Paper Scissors so far
+have only their page: protocol, screens and preview, with no room logic yet. Each one's
+`protocol.ts` is the contract its future Durable Object has to implement. Follow Doodle's
+pattern: a pure, tested state machine in `server/src/<game>/`, wired through a Durable Object,
+plus a route in `server/src/index.ts`.
+
 ## Games
 
 ### Slingwell (`slingwell/`)
@@ -125,13 +159,12 @@ how many free slots it has, and keeps keyboard focus on the same column across r
 1–7 drop into a column, and the arrow keys move between columns. Yellow discs have a ring, so the
 two sides differ in shape as well as colour.
 
-### Doodle Telephone (`doodle-telephone/` + `server/`), multiplayer — not live yet
+### Doodle Telephone (`doodle-telephone/` + `server/`), online — preview until the server is deployed
 
-**Held back (2026-09-18):** the code is complete and tested, but it is not in `vite.config.ts`'s
-`input`, and its menu card is a non-link "Coming soon", because the Worker has never been
-deployed (`npx wrangler login` hasn't been run on this machine yet). To launch: deploy the server,
-run `npm run smoke:server -- https://rooms.sbdevworks.com`, then add the build input and turn the
-card into a link, as one commit.
+The page and the server are both complete and tested; only the Worker deploy is missing
+(`npx wrangler login` hasn't been run on this machine yet). To launch: deploy the server, run
+`npm run smoke:server -- https://rooms.sbdevworks.com`, then build with `VITE_ROOMS_ONLINE=true`
+(see "Online games" above).
 
 A Gartic Phone-style party game for 2 to 12 players. Someone creates a room (4-letter code, no I
 or O) and friends join with the code and a nickname. There are no accounts. Everyone writes a
@@ -164,8 +197,9 @@ each drawing replays stroke by stroke.
   origins in `ALLOWED_ORIGINS` (`server/wrangler.jsonc`).
 - **Wire format:** `doodle-telephone/src/protocol.ts`, imported by both sides.
 - **Page code:**
-  - `views.ts`: DOM screens, tested in jsdom.
-  - `connection.ts`: WebSocket with reconnect backoff, tested with a fake socket.
+  - `views.ts`: the playing and reveal screens, tested in jsdom. Home, lobby and the connection
+    come from the shared room kit.
+  - `fixtures.ts`: sample states for preview mode.
   - `strokes.ts`: stroke maths and painting, tested with a recording context.
   - `pad.ts` (canvas input) and `main.ts` (glue) are left out of coverage.
   - A half-finished drawing or guess survives re-renders, because `main.ts` owns those elements
@@ -181,6 +215,36 @@ mid-game rejoin, a foreign origin, and an unknown room code. It isn't in CI.
 machine, and it isn't in Jenkins yet: automating it needs a Cloudflare API token stored in
 Jenkins. The Worker has to be deployed before a page change that depends on a protocol change
 goes out.
+
+### Quiz Night (`quiz-night/`), online — page only
+
+Timed multiple-choice trivia for 2 to 12 players. Server slug: `quiz`. The host moves the game on
+with `next`. Phases:
+
+- `question`: four choices, each marked with a letter and a shape as well as a colour, locked once
+  picked.
+- `answer`: the correct choice, how many players picked each, and your points.
+- `scores`: the leaderboard, with this round's gains.
+- `final`: a podium.
+
+### Imposter (`imposter/`), online — page only
+
+3 to 10 players. Server slug: `imposter`. Everyone but the imposter sees the secret word and its
+category; the imposter sees only the category. The imposter's own view must never carry the
+word: that's the server's job, and the page only renders `role`. Phases:
+
+- `clues`: one clue each, in turn order. The input is kept per turn, so a half-typed clue
+  survives re-renders.
+- `vote`: pick anyone but yourself; locked once cast.
+- `result`: who it was, the word, and the vote tally.
+
+### Rock Paper Scissors (`rock-paper-scissors/`), online — page only
+
+A best-of-five duel for exactly 2 players. Server slug: `rps`. Phases:
+
+- `choose`: three moves. You see whether the opponent has locked in, never what they picked.
+- `reveal`: both hands, and who took the round.
+- `over`: the match winner, and a rematch.
 
 ### Not built yet, any game
 

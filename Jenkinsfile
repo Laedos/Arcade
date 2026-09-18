@@ -28,7 +28,7 @@ pipeline {
                         docker.image('sonarsource/sonar-scanner-cli:latest').inside('--network ci-internal') {
                             sh 'sonar-scanner -Dsonar.projectKey=arcade -Dsonar.projectName=Arcade ' +
                                '-Dsonar.sources=. -Dsonar.inclusions=*/src/**,*/index.html,index.html,menu.css -Dsonar.exclusions=**/*.test.ts,node_modules/**,dist/** ' +
-                               '-Dsonar.coverage.exclusions=*/src/main.ts,*/src/render.ts,*/src/protocol.ts,doodle-telephone/src/pad.ts,server/src/index.ts,server/src/doodle/DoodleRoom.ts,**/*.css,**/*.html ' +
+                               '-Dsonar.coverage.exclusions=*/src/main.ts,*/src/render.ts,*/src/protocol.ts,doodle-telephone/src/pad.ts,*/src/fixtures.ts,shared/src/rooms/page.ts,shared/src/rooms/config.ts,server/src/index.ts,server/src/doodle/DoodleRoom.ts,**/*.css,**/*.html ' +
                                '-Dsonar.javascript.lcov.reportPaths=coverage/lcov.info'
                         }
                     }
