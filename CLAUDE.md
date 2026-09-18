@@ -91,6 +91,30 @@ The classic 5x5 puzzle: pressing a light flips it and its four neighbours.
   screen readers.
 - Best score is the highest level solved (`lights-out.best`). Play resumes at the level after it.
 
+### 2048 (`2048/`)
+
+The sliding-tile puzzle on a 4x4 board. Moves use the arrow keys, WASD, or a swipe on the board.
+`slideLine` merges each pair once, front first (`[2,2,2,2]` becomes `[4,4]`, and `[4,4,8]` becomes
+`[8,8]`, not 16). A move that changes nothing adds no tile. New tiles are a 2 nine times in ten,
+otherwise a 4. Reaching 2048 sets `won` once and play continues; the game ends only when no move
+is possible. `state.spawned` and `state.merged` exist only to drive the pop animations in
+`view.ts`. Best score key: `2048.best`.
+
+### Brick Breaker (`brick-breaker/`)
+
+Paddle and ball on a 400x600 world. The paddle follows the pointer, or the arrow keys / A-D;
+keys take over until the pointer moves again. Space, Enter or a tap launches the ball.
+
+- Where the ball lands on the paddle sets its exit angle, up to 60° either side, which is how the
+  player aims.
+- A brick hit reflects off the face the ball is least pushed into, scores the brick's row value
+  (higher rows are worth more), and speeds the ball up 1% (capped).
+- The ball moves in sub-steps of at most 3 units, so it can't tunnel through a brick even in a
+  long frame.
+- 3 lives. Clearing the board starts the next level with one more row (up to 8) and a faster
+  base speed.
+- Best score key: `brick-breaker.best`.
+
 ### Four in a Row (`four-in-a-row/`), multiplayer on one device
 
 Two players take turns on the same screen; the first to line up four discs wins. `game.ts` holds

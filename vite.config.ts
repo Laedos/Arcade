@@ -12,6 +12,8 @@ export default defineConfig({
         stacker: resolve(import.meta.dirname, 'stacker/index.html'),
         snake: resolve(import.meta.dirname, 'snake/index.html'),
         'lights-out': resolve(import.meta.dirname, 'lights-out/index.html'),
+        '2048': resolve(import.meta.dirname, '2048/index.html'),
+        'brick-breaker': resolve(import.meta.dirname, 'brick-breaker/index.html'),
         'four-in-a-row': resolve(import.meta.dirname, 'four-in-a-row/index.html'),
       },
     },

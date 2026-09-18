@@ -289,3 +289,34 @@ h1 {
   outline-offset: 3px;
   border-radius: 4px;
 }
+
+.t2048.t-a { fill: #efe4d6; }
+.t2048.t-b { fill: #ece0c8; }
+.t2048.t-c { fill: #f2b179; }
+.t2048.t-d { fill: #f59563; }
+
+.t-num {
+  fill: #2b221c;
+  font: 700 16px "Space Grotesk", system-ui, sans-serif;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.t-num.light {
+  fill: #fff8ef;
+}
+
+.brick {
+  fill: hsl(calc(var(--h) * 1deg) 80% 60%);
+}
+
+.trail {
+  fill: none;
+  stroke: rgba(255, 246, 194, 0.45);
+  stroke-width: 2;
+  stroke-dasharray: 3 4;
+}
+
+.paddle {
+  fill: var(--accent);
+}
