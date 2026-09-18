@@ -1,0 +1,116 @@
+:root {
+  --bg: #140f24;
+  --text: #eef1ff;
+  --muted: rgba(238, 241, 255, 0.65);
+  --off: #241c3d;
+  --off-edge: #34295a;
+  --on: #ffd978;
+  --on-glow: rgba(255, 217, 120, 0.55);
+  --accent: #78ffd6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: radial-gradient(circle at 50% 0%, #2a1f4a 0%, var(--bg) 60%) fixed;
+  color: var(--text);
+  font-family: "Space Grotesk", system-ui, sans-serif;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 64px 16px 32px;
+  text-align: center;
+}
+
+h1 {
+  margin: 0;
+  font-size: 40px;
+}
+
+.hint {
+  margin: 8px 0 4px;
+  color: var(--muted);
+}
+
+.stats {
+  margin: 0 0 20px;
+  font-weight: 700;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  width: min(100%, 400px);
+}
+
+.light {
+  aspect-ratio: 1;
+  border: 2px solid var(--off-edge);
+  border-radius: 14px;
+  background: var(--off);
+  cursor: pointer;
+  transition: background 120ms, box-shadow 120ms, border-color 120ms;
+}
+
+.light[aria-pressed="true"] {
+  border-color: var(--on);
+  background: var(--on);
+  box-shadow: 0 0 18px var(--on-glow);
+}
+
+.light:focus-visible,
+.actions button:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.light:disabled {
+  cursor: default;
+}
+
+.result {
+  min-height: 1.5em;
+  margin: 18px 0 8px;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.actions button {
+  padding: 10px 18px;
+  border: 1px solid var(--off-edge);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  font: 600 15px "Space Grotesk", system-ui, sans-serif;
+  cursor: pointer;
+}
+
+.actions button.primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #0b1026;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .light {
+    transition: none;
+  }
+}

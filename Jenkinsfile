@@ -1,6 +1,6 @@
 @Library('ci-shared-library') _
 
-// Single-stack web repo (menu + one folder per game, one multi-page Vite build): same shape as
+// Single-stack web repo (menu + one folder per game + shared/, one multi-page Vite build): same shape as
 // PollDrop's Jenkinsfile.ui, run from the repo root.
 pipeline {
     agent any
@@ -27,8 +27,8 @@ pipeline {
                     runSonarAnalysis {
                         docker.image('sonarsource/sonar-scanner-cli:latest').inside('--network ci-internal') {
                             sh 'sonar-scanner -Dsonar.projectKey=arcade -Dsonar.projectName=Arcade ' +
-                               '-Dsonar.sources=. -Dsonar.inclusions=*/src/**,index.html,menu.css -Dsonar.exclusions=**/*.test.ts,node_modules/**,dist/** ' +
-                               '-Dsonar.coverage.exclusions=*/src/main.ts,*/src/render.ts,index.html,menu.css ' +
+                               '-Dsonar.sources=. -Dsonar.inclusions=*/src/**,*/index.html,index.html,menu.css -Dsonar.exclusions=**/*.test.ts,node_modules/**,dist/** ' +
+                               '-Dsonar.coverage.exclusions=*/src/main.ts,*/src/render.ts,**/*.css,**/*.html ' +
                                '-Dsonar.javascript.lcov.reportPaths=coverage/lcov.info'
                         }
                     }

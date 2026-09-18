@@ -9,6 +9,9 @@ export default defineConfig({
       input: {
         menu: resolve(import.meta.dirname, 'index.html'),
         slingwell: resolve(import.meta.dirname, 'slingwell/index.html'),
+        stacker: resolve(import.meta.dirname, 'stacker/index.html'),
+        snake: resolve(import.meta.dirname, 'snake/index.html'),
+        'lights-out': resolve(import.meta.dirname, 'lights-out/index.html'),
       },
     },
   },

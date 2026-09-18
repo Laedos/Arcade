@@ -57,8 +57,7 @@ h1 {
   list-style: none;
 }
 
-.card,
-.soon {
+.card {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -116,19 +115,11 @@ h1 {
   fill: #fff6c2;
 }
 
-.card-body,
-.soon {
+.card-body {
   display: flex;
   flex-direction: column;
   gap: 6px;
   padding: 16px 18px 18px;
-}
-
-.soon {
-  justify-content: center;
-  min-height: 160px;
-  border-style: dashed;
-  background: none;
 }
 
 .title {
@@ -156,4 +147,47 @@ h1 {
   .card:hover {
     transform: none;
   }
+}
+
+.block {
+  fill: hsl(calc(var(--h) * 1deg) 75% 58%);
+}
+
+.moving {
+  opacity: 0.9;
+}
+
+.debris {
+  opacity: 0.55;
+}
+
+.snake-body {
+  fill: none;
+  stroke: #5cf2b8;
+  stroke-width: 10;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.apple {
+  fill: var(--warm);
+}
+
+.mirror {
+  fill: none;
+  stroke: #ff9be6;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.bulb {
+  fill: #241c3d;
+  stroke: #34295a;
+  stroke-width: 1.5;
+}
+
+.bulb.on {
+  fill: var(--warm);
+  stroke: var(--warm);
 }
