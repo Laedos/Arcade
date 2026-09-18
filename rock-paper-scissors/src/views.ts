@@ -86,11 +86,12 @@ function revealView(room: RoomView, actions: DuelActions): HTMLElement {
 
 function overView(room: RoomView, actions: DuelActions): HTMLElement {
   const won = room.matchWinnerId === room.youId
+  const winner = room.matchWinnerId ? nameOf(room, room.matchWinnerId) : 'Nobody'
   return h(
     'section',
     { class: 'panel' },
     scoreboard(room),
-    h('h2', { class: 'headline' }, won ? 'You win the match!' : `${room.matchWinnerId ? nameOf(room, room.matchWinnerId) : 'Nobody'} wins the match.`),
+    h('h2', { class: 'headline' }, won ? 'You win the match!' : `${winner} wins the match.`),
     isHost(room) ? button('Rematch', actions.rematch, 'primary') : h('p', { class: 'hint' }, 'Waiting for a rematch…'),
   )
 }

@@ -76,7 +76,8 @@ function cluesView(room: RoomView, clueInput: HTMLInputElement, actions: Imposte
 function voteView(room: RoomView, actions: ImposterActions): HTMLElement {
   const others = room.players.filter((p) => p.id !== room.youId)
   const ballot = others.map((p) => {
-    const b = button(`${p.name}${p.clue ? ` · “${p.clue}”` : ''}`, () => actions.vote(p.id), 'suspect')
+    const label = p.clue ? `${p.name} · “${p.clue}”` : p.name
+    const b = button(label, () => actions.vote(p.id), 'suspect')
     b.setAttribute('aria-pressed', String(room.yourVote === p.id))
     b.disabled = room.yourVote !== null
     return b
