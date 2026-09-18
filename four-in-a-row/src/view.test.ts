@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, expect, it, vi } from 'vitest'
-import { COLS, createGame, drop } from './game'
+import { COLS, createGame, drop, ROWS } from './game'
 import { renderBoard, renderScores, statusText } from './view'
 
 function mount() {
@@ -78,5 +78,42 @@ describe('renderScores', () => {
     const el = document.createElement('p')
     renderScores(el, { 1: 2, 2: 1, draws: 3 })
     expect(el.textContent).toBe('Red 2 · Yellow 1 · Draws 3')
+  })
+})
+
+describe('keyboard focus when a column fills', () => {
+  it('moves to the nearest column that still has room', () => {
+    const board = mount()
+    const state = createGame()
+    for (let i = 0; i < 5; i++) drop(state, 3)
+    renderBoard(board, state, vi.fn())
+    columns(board)[3].focus()
+    drop(state, 3)
+    renderBoard(board, state, vi.fn())
+    expect((document.activeElement as HTMLElement).dataset.col).toBe('2')
+  })
+
+  it('looks the other way when the near side is full too', () => {
+    const board = mount()
+    const state = createGame()
+    // Columns 0-2 full except the top of column 2, colours alternating by row so nothing wins.
+    for (let row = 0; row < ROWS; row++) {
+      for (const col of [0, 1, 2]) if (!(row === 0 && col === 2)) state.board[row * COLS + col] = row % 2 === 0 ? 1 : 2
+    }
+    renderBoard(board, state, vi.fn())
+    columns(board)[2].focus()
+    drop(state, 2)
+    renderBoard(board, state, vi.fn())
+    expect((document.activeElement as HTMLElement).dataset.col).toBe('3')
+  })
+
+  it('lets focus go when no column can take a disc', () => {
+    const board = mount()
+    const state = createGame()
+    renderBoard(board, state, vi.fn())
+    columns(board)[0].focus()
+    state.draw = true
+    renderBoard(board, state, vi.fn())
+    expect(document.activeElement).toBe(document.body)
   })
 })

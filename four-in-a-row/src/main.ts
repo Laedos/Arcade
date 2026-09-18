@@ -16,6 +16,8 @@ function play(col: number): void {
   if (!drop(state, col)) return
   if (isOver(state)) scores = recordResult(scores, state)
   render()
+  // Every column is disabled once the round ends, so hand focus to the next step.
+  if (isOver(state)) newRound.focus()
 }
 
 function render(): void {

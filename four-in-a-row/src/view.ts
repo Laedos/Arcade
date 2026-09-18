@@ -44,7 +44,18 @@ export function renderBoard(board: HTMLElement, state: FourState, onDrop: (col: 
   })
   board.classList.toggle('p2-turn', state.turn === 2)
   board.replaceChildren(...columns)
-  if (focusedCol >= 0) columns[focusedCol].focus()
+  if (focusedCol >= 0) nearestOpen(columns, focusedCol)?.focus()
+}
+
+// The same column if it can still take a disc, otherwise the closest one that can, so keyboard
+// players don't lose their place when a column fills up.
+function nearestOpen(columns: HTMLButtonElement[], from: number): HTMLButtonElement | undefined {
+  for (let distance = 0; distance < columns.length; distance++) {
+    for (const col of [from - distance, from + distance]) {
+      if (columns[col] && !columns[col].disabled) return columns[col]
+    }
+  }
+  return undefined
 }
 
 export function renderScores(el: HTMLElement, scores: Scores): void {

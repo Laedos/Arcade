@@ -53,7 +53,9 @@ Every online game (the Multiplayer shelf, except Four in a Row) is built on `sha
 - `lobby.ts`: the home screen (name, then create or join by code) and the lobby (code, invite
   link, players, Start for the host).
 - `page.ts`: `startRoomPage()` wires the whole page: create/join, reconnect, leave, errors, the
-  lobby, a countdown in any `#timer` element (using the server's clock), and preview mode. A game
+  lobby, a countdown in any `#timer` element (using the server's clock), and preview mode. Redraws go through
+  `replaceKeepingFocus()`, so a kept answer box keeps its focus and cursor when another player's
+  move updates the screen. A game
   only supplies `render` for its phases after the lobby, plus optional `afterRender`/`tick`
   hooks.
 - `rooms.css`: the shared look. A game sets the colour variables and styles its own screens.
@@ -132,7 +134,7 @@ The sliding-tile puzzle on a 4x4 board. Moves use the arrow keys, WASD, or a swi
 `[8,8]`, not 16). A move that changes nothing adds no tile. New tiles are a 2 nine times in ten,
 otherwise a 4. Reaching 2048 sets `won` once and play continues; the game ends only when no move
 is possible. `state.spawned` and `state.merged` exist only to drive the pop animations in
-`view.ts`. Best score key: `2048.best`.
+`view.ts`. Best score key: `2048.best`, saved as soon as it is beaten, not only at game over.
 
 ### Brick Breaker (`brick-breaker/`)
 
@@ -182,13 +184,17 @@ each drawing replays stroke by stroke.
 - **Server-authoritative.** Seat i works on chain `(i - step) mod N`. Clients hand in whatever
   they have when their countdown hits zero. The server waits 3 more seconds (`GRACE_MS`), then
   fills any missing entry with "…" or an empty drawing and moves on. It also moves on as soon as
-  every connected player has submitted. Countdowns use the server's clock (`now` in every state
-  message), not the device's.
+  every player it's still expecting has submitted. Countdowns use the server's clock (`now` in
+  every state message), not the device's. If a player's socket isn't open when their countdown
+  hits zero (mid-reconnect), `send()` returns false and the hand-in is retried every tick.
 - **Rooms live in memory only, with no storage.** A room is gone once Cloudflare evicts the
   object after everyone leaves, or on a deploy. Fine for a party game; don't deploy mid-party.
   - In the lobby, a player who disconnects leaves.
   - Mid-game their seat is kept; the page stores a per-room token in `localStorage`, so a refresh
-    rejoins the same seat.
+    rejoins the same seat. The others keep waiting for a dropped player for `REJOIN_GRACE_MS`
+    (15 s, never past the turn's clock), so a blip or a refresh doesn't blank their work. After
+    that the game carries on without them. `nextWakeAt()` schedules the alarm for whichever comes
+    first.
   - The same player in a second tab replaces the first connection (close code 4000). A refused
     join closes with code 4004. The client doesn't retry either code.
 - **Untrusted input.** Every drawing is cleaned server-side: only palette colours and brush sizes

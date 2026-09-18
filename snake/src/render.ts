@@ -65,7 +65,8 @@ export function draw(ctx: CanvasRenderingContext2D, state: SnakeState, board: Bo
 
 function banner(ctx: CanvasRenderingContext2D, board: Board, unit: number, title: string, line1: string, line2: string): void {
   const cx = board.x + board.size / 2
-  const cy = board.y + board.size / 2
+  // Upper quarter of the board, clear of the snake, which starts on the middle row.
+  const cy = board.y + board.size * 0.25
   ctx.fillStyle = 'rgba(8, 12, 20, 0.72)'
   ctx.fillRect(board.x, cy - 70 * unit, board.size, 140 * unit)
   ctx.fillStyle = '#eef1ff'

@@ -36,13 +36,16 @@ function render(justWon = false): void {
 function play(direction: Direction): void {
   const wasWon = state.won
   if (!move(state, direction)) return
-  if (state.over) best = saveBest(BEST_KEY, state.score)
+  // Saved as it's beaten, not just at the end, so closing the tab mid-game keeps it.
+  if (state.score > best) best = saveBest(BEST_KEY, state.score)
   render(state.won && !wasWon)
 }
 
 window.addEventListener('keydown', (event) => {
   const direction = KEYS[event.code]
-  if (!direction || event.target instanceof HTMLAnchorElement || event.target instanceof HTMLButtonElement) return
+  // Arrows and WASD never activate a button, so they play even while "New game" has focus; only
+  // the back link is left alone.
+  if (!direction || event.target instanceof HTMLAnchorElement) return
   event.preventDefault()
   play(direction)
 })
@@ -62,7 +65,6 @@ boardEl.addEventListener('pointerup', (event) => {
 })
 
 newGame.addEventListener('click', () => {
-  if (state.score > 0) best = saveBest(BEST_KEY, state.score)
   state = createGame()
   render()
 })

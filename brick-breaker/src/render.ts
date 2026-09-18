@@ -21,17 +21,34 @@ export function toWorldX(clientX: number, canvasLeft: number, pixelRatio: number
 }
 
 export function draw(ctx: CanvasRenderingContext2D, state: BreakerState, view: Viewport, best: number): void {
-  ctx.fillStyle = '#070b1a'
+  // The field's colours fill the whole canvas, so a tall phone screen shows one continuous
+  // playfield rather than dark bands above and below the world.
+  const backdrop = ctx.createLinearGradient(0, 0, 0, view.height)
+  backdrop.addColorStop(0, '#111a3d')
+  backdrop.addColorStop(1, '#0b1026')
+  ctx.fillStyle = backdrop
   ctx.fillRect(0, 0, view.width, view.height)
 
   ctx.save()
   ctx.translate(view.offsetX, view.offsetY)
   ctx.scale(view.scale, view.scale)
-  const field = ctx.createLinearGradient(0, 0, 0, WORLD_HEIGHT)
-  field.addColorStop(0, '#111a3d')
-  field.addColorStop(1, '#0b1026')
-  ctx.fillStyle = field
-  ctx.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT)
+  // The side walls, so a wide screen still shows where the ball bounces.
+  ctx.strokeStyle = 'rgba(120, 255, 214, 0.25)'
+  ctx.lineWidth = 2
+  ctx.beginPath()
+  ctx.moveTo(0, 0)
+  ctx.lineTo(0, WORLD_HEIGHT)
+  ctx.moveTo(WORLD_WIDTH, 0)
+  ctx.lineTo(WORLD_WIDTH, WORLD_HEIGHT)
+  ctx.stroke()
+  // The floor: past this line the ball is lost.
+  ctx.strokeStyle = 'rgba(255, 120, 140, 0.35)'
+  ctx.setLineDash([6, 8])
+  ctx.beginPath()
+  ctx.moveTo(0, WORLD_HEIGHT)
+  ctx.lineTo(WORLD_WIDTH, WORLD_HEIGHT)
+  ctx.stroke()
+  ctx.setLineDash([])
 
   for (const brick of state.bricks) {
     if (!brick.alive) continue
