@@ -12,7 +12,7 @@ export default defineConfig({
         stacker: resolve(import.meta.dirname, 'stacker/index.html'),
         snake: resolve(import.meta.dirname, 'snake/index.html'),
         'lights-out': resolve(import.meta.dirname, 'lights-out/index.html'),
-        'doodle-telephone': resolve(import.meta.dirname, 'doodle-telephone/index.html'),
+        'four-in-a-row': resolve(import.meta.dirname, 'four-in-a-row/index.html'),
       },
     },
   },

@@ -245,3 +245,19 @@ h1 {
   stroke-width: 2;
   stroke-linecap: round;
 }
+
+.grid {
+  fill: #2447b8;
+}
+
+.red {
+  fill: #ef4b4b;
+}
+
+.yellow {
+  fill: #ffd23f;
+}
+
+.hole {
+  fill: #0c1430;
+}

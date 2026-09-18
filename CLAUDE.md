@@ -91,7 +91,23 @@ The classic 5x5 puzzle: pressing a light flips it and its four neighbours.
   screen readers.
 - Best score is the highest level solved (`lights-out.best`). Play resumes at the level after it.
 
-### Doodle Telephone (`doodle-telephone/` + `server/`), multiplayer
+### Four in a Row (`four-in-a-row/`), multiplayer on one device
+
+Two players take turns on the same screen; the first to line up four discs wins. `game.ts` holds
+the rules: drop, win detection in all four directions, and draws. A disc that completes two lines
+at once highlights both. It also keeps the score tally for the session, and whoever didn't start
+the last round starts the next. `view.ts` renders seven real column buttons, each labelled with
+how many free slots it has, and keeps keyboard focus on the same column across re-renders. Keys:
+1–7 drop into a column, and the arrow keys move between columns. Yellow discs have a ring, so the
+two sides differ in shape as well as colour.
+
+### Doodle Telephone (`doodle-telephone/` + `server/`), multiplayer — not live yet
+
+**Held back (2026-09-18):** the code is complete and tested, but it is not in `vite.config.ts`'s
+`input`, and its menu card is a non-link "Coming soon", because the Worker has never been
+deployed (`npx wrangler login` hasn't been run on this machine yet). To launch: deploy the server,
+run `npm run smoke:server -- https://rooms.sbdevworks.com`, then add the build input and turn the
+card into a link, as one commit.
 
 A Gartic Phone-style party game for 2 to 12 players. Someone creates a room (4-letter code, no I
 or O) and friends join with the code and a nickname. There are no accounts. Everyone writes a
