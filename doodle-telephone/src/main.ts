@@ -199,7 +199,7 @@ function paintDrawings(): void {
 // out (the server waits a few seconds longer before filling in a blank).
 function updateTimer(): void {
   const timer = document.querySelector<HTMLElement>('#timer')
-  if (!room || room.phase !== 'playing' || room.deadline === null) return
+  if (room?.phase !== 'playing' || room.deadline === null) return
   const left = room.deadline - (Date.now() + serverOffset)
   if (timer) timer.textContent = formatSeconds(left)
   if (left > 0 || autoSubmitted || !room.task) return
