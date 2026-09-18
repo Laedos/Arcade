@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { loadBest, saveBest } from './storage'
+import { loadBest, saveBest } from './bestScore'
+
+const KEY = 'test.best'
 
 function memoryStorage() {
   const values = new Map<string, string>()
@@ -27,31 +29,31 @@ describe('best score storage', () => {
   })
 
   it('starts at zero when nothing is stored', () => {
-    expect(loadBest(memoryStorage())).toBe(0)
+    expect(loadBest(KEY, memoryStorage())).toBe(0)
   })
 
   it('keeps the higher of the new and stored score', () => {
     const storage = memoryStorage()
-    expect(saveBest(12, storage)).toBe(12)
-    expect(saveBest(5, storage)).toBe(12)
-    expect(loadBest(storage)).toBe(12)
+    expect(saveBest(KEY, 12, storage)).toBe(12)
+    expect(saveBest(KEY, 5, storage)).toBe(12)
+    expect(loadBest(KEY, storage)).toBe(12)
   })
 
   it('ignores garbage in storage', () => {
     const storage = memoryStorage()
-    storage.setItem('slingwell.best', 'not a number')
-    expect(loadBest(storage)).toBe(0)
+    storage.setItem(KEY, 'not a number')
+    expect(loadBest(KEY, storage)).toBe(0)
   })
 
   it('degrades to zero and the in-memory score when storage throws', () => {
-    expect(loadBest(brokenStorage)).toBe(0)
-    expect(saveBest(7, brokenStorage)).toBe(7)
+    expect(loadBest(KEY, brokenStorage)).toBe(0)
+    expect(saveBest(KEY, 7, brokenStorage)).toBe(7)
   })
 
   it('uses the browser localStorage by default', () => {
     vi.stubGlobal('localStorage', memoryStorage())
-    saveBest(9)
-    expect(loadBest()).toBe(9)
+    saveBest(KEY, 9)
+    expect(loadBest(KEY)).toBe(9)
   })
 
   it('falls back to no storage when even reaching localStorage throws', () => {
@@ -61,11 +63,11 @@ describe('best score storage', () => {
         throw new Error('SecurityError')
       },
     })
-    expect(loadBest()).toBe(0)
+    expect(loadBest(KEY)).toBe(0)
   })
 
   it('treats missing storage as empty', () => {
-    expect(loadBest(null)).toBe(0)
-    expect(saveBest(3, null)).toBe(3)
+    expect(loadBest(KEY, null)).toBe(0)
+    expect(saveBest(KEY, 3, null)).toBe(3)
   })
 })

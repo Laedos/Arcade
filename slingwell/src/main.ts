@@ -1,18 +1,20 @@
-import './style.css'
+import '../../shared/src/page.css'
+import '../../shared/src/canvas-page.css'
 import { createGame, release, step } from './game'
 import { draw, fitViewport } from './render'
-import { loadBest, saveBest } from './storage'
+import { loadBest, saveBest } from '../../shared/src/bestScore'
 
 const FIXED_DT = 1 / 120
 const MAX_FRAME_SECONDS = 0.25
 const RESTART_DELAY_MS = 400
+const BEST_KEY = 'slingwell.best'
 
 const canvas = document.querySelector<HTMLCanvasElement>('#game')!
 const status = document.querySelector<HTMLElement>('#status')!
 const ctx = canvas.getContext('2d')!
 
 let state = createGame(Date.now())
-let best = loadBest()
+let best = loadBest(BEST_KEY)
 let overSince = 0
 let viewport = fitViewport(1, 1)
 
@@ -60,7 +62,7 @@ function frame(now: number): void {
   }
   if (!wasOver && state.phase === 'over') {
     overSince = performance.now()
-    best = saveBest(state.score)
+    best = saveBest(BEST_KEY, state.score)
     status.textContent = `Lost in space. Score ${state.score}, best ${best}. Press Space to fly again.`
   }
   draw(ctx, state, viewport, Math.max(best, state.score))
