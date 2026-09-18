@@ -39,6 +39,8 @@ canvas.addEventListener('pointerdown', (event) => {
 })
 window.addEventListener('keydown', (event) => {
   if (event.code !== 'Space' && event.code !== 'Enter') return
+  // Enter on the back link should follow it, not launch the player.
+  if (event.target instanceof HTMLAnchorElement) return
   event.preventDefault()
   if (!event.repeat) act()
 })

@@ -4,15 +4,44 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#0b1026" />
-    <meta name="description" content="Slingwell - a one-button orbital slingshot game." />
+    <meta name="description" content="Arcade - small browser games by SB Dev Works." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
-    <title>Slingwell</title>
+    <link rel="stylesheet" href="./menu.css" />
+    <title>Arcade</title>
   </head>
   <body>
-    <canvas id="game" aria-label="Slingwell game. Press Space, Enter, or tap to let go of the orbit." role="img"></canvas>
-    <p id="status" class="sr-only" aria-live="polite"></p>
-    <script type="module" src="/src/main.ts"></script>
+    <main>
+      <header>
+        <p class="eyebrow">SB Dev Works</p>
+        <h1>Arcade</h1>
+        <p class="lede">Small games that run in your browser. No installs, no accounts.</p>
+      </header>
+
+      <ul class="games">
+        <li>
+          <a class="card" href="./slingwell/">
+            <svg class="thumb" viewBox="0 0 160 100" aria-hidden="true">
+              <circle cx="48" cy="62" r="26" class="orbit" />
+              <circle cx="48" cy="62" r="11" class="planet planet-a" />
+              <circle cx="118" cy="30" r="20" class="orbit" />
+              <circle cx="118" cy="30" r="8" class="planet planet-b" />
+              <path d="M74 60 L104 38" class="path" />
+              <circle cx="74" cy="60" r="4" class="player" />
+            </svg>
+            <span class="card-body">
+              <span class="title">Slingwell</span>
+              <span class="blurb">Circle a planet, let go at the right moment, get caught by the next orbit. One button.</span>
+              <span class="play">Play →</span>
+            </span>
+          </a>
+        </li>
+        <li class="soon" aria-label="More games coming soon">
+          <span class="title">More soon</span>
+          <span class="blurb">Next game in the works.</span>
+        </li>
+      </ul>
+    </main>
   </body>
 </html>
