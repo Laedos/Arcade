@@ -7,15 +7,19 @@ import { type QuizActions, quizView, ranked } from './views'
 const actions = (): QuizActions => ({ answer: vi.fn(), next: vi.fn(), playAgain: vi.fn() })
 const asGuest = (room: RoomView): RoomView => ({ ...room, youId: 'ben' })
 const click = (el: HTMLElement, label: string) => [...el.querySelectorAll('button')].find((b) => b.textContent === label)!.click()
+// The fixtures draw from the real question bank, so the expectations come from the fixture itself
+// rather than a second copy of its wording.
+const asked = sampleQuestion.question!
+const correct = sampleAnswer.answer!.correct
 
 describe('question', () => {
   it('shows the question with four labelled choices and answers on click', () => {
     const a = actions()
     const view = quizView(sampleQuestion, a)
-    expect(view.textContent).toContain('Question 4 of 10 · Space')
-    expect(view.querySelector('h2')!.textContent).toBe('Which planet has the shortest day?')
+    expect(view.textContent).toContain(`Question ${asked.number} of ${asked.total} · ${asked.category}`)
+    expect(view.querySelector('h2')!.textContent).toBe(asked.text)
     const choices = [...view.querySelectorAll<HTMLButtonElement>('button.choice')]
-    expect(choices.map((c) => c.getAttribute('aria-label'))).toEqual(['A: Mercury', 'B: Jupiter', 'C: Earth', 'D: Neptune'])
+    expect(choices.map((c) => c.getAttribute('aria-label'))).toEqual(asked.choices.map((choice, i) => `${'ABCD'[i]}: ${choice}`))
     choices[1].click()
     expect(a.answer).toHaveBeenCalledWith(1)
     expect(view.textContent).toContain('1 of 4 answered.')
@@ -25,7 +29,7 @@ describe('question', () => {
     const view = quizView(sampleLocked, actions())
     const choices = [...view.querySelectorAll<HTMLButtonElement>('button.choice')]
     expect(choices.every((c) => c.disabled)).toBe(true)
-    expect(choices[1].classList.contains('picked')).toBe(true)
+    expect(choices[sampleLocked.yourChoice!].classList.contains('picked')).toBe(true)
     expect(view.textContent).toContain('Locked in.')
   })
 })
@@ -35,17 +39,17 @@ describe('answer', () => {
     const a = actions()
     const view = quizView(sampleAnswer, a)
     const rows = [...view.querySelectorAll('li.result')]
-    expect(rows[1].classList.contains('correct')).toBe(true)
-    expect(rows[1].textContent).toContain('correct')
-    expect(rows[1].textContent).toContain('your pick')
-    expect(rows.map((r) => r.querySelector('.count')!.textContent)).toEqual(['1', '2', '0', '1'])
+    expect(rows[correct].classList.contains('correct')).toBe(true)
+    expect(rows[correct].textContent).toContain('correct')
+    expect(rows[correct].textContent).toContain('your pick')
+    expect(rows.map((r) => r.querySelector('.count')!.textContent)).toEqual(sampleAnswer.answer!.picks.map(String))
     expect(view.querySelector('.verdict')!.textContent).toBe('Right! +820 points.')
     click(view, 'Show scores')
     expect(a.next).toHaveBeenCalled()
   })
 
   it('tells a wrong or missing answer apart, and makes guests wait for the host', () => {
-    const wrong = quizView(asGuest({ ...sampleAnswer, yourChoice: 0 }), actions())
+    const wrong = quizView(asGuest({ ...sampleAnswer, yourChoice: (correct + 1) % asked.choices.length }), actions())
     expect(wrong.querySelector('.verdict')!.textContent).toBe('Not this time.')
     expect(wrong.querySelector('button')).toBeNull()
     expect(wrong.textContent).toContain('The host will show the scores')
