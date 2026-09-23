@@ -1,3 +1,5 @@
+import { mulberry32 } from '../../shared/src/rng'
+
 export const WORLD_WIDTH = 400
 export const VIEW_HEIGHT = 700
 
@@ -45,17 +47,6 @@ export interface GameState {
   cameraY: number
   nextId: number
   rng: () => number
-}
-
-export function mulberry32(seed: number): () => number {
-  let a = seed >>> 0
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0
-    let t = a
-    t = Math.imul(t ^ (t >>> 15), t | 1)
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
 }
 
 export function makePlanet(id: number, x: number, y: number, orbit: number, drift?: Pick<Planet, 'driftAmplitude' | 'driftSpeed' | 'driftPhase'>): Planet {

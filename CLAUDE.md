@@ -15,8 +15,8 @@ TypeScript + Vite, plain Canvas 2D / DOM, no framework and no runtime dependenci
 also have a Cloudflare Worker backend in `server/` (Durable Objects, TypeScript), the one part of
 Arcade not hosted on GitHub Pages; see Doodle Telephone below. One
 `package.json`, one Vitest run, one oxlint run and one multi-page Vite build for the whole
-collection. Games share tooling and a small `shared/src/` (best-score storage, page CSS), never
-game logic. Versions follow the web baseline in `CLAUDE-web.md`. `.npmrc` sets
+collection. Games share tooling and a small `shared/src/` (best-score storage, a seeded RNG, page CSS),
+never game logic. Versions follow the web baseline in `CLAUDE-web.md`. `.npmrc` sets
 `legacy-peer-deps`, because npm 9's resolver crashes (`edgesOut`) on vitest 4.1.11, the same bug
 Tenanza hit (npm 10 in CI is fine either way).
 
@@ -26,7 +26,8 @@ Tenanza hit (npm 10 in CI is fine either way).
   inline SVG thumbnail.
 - `<game>/index.html` + `<game>/src/`: one game. Each game page links back to the menu (`href="/"`).
 - `shared/src/`: `bestScore.ts` stores a best score per `localStorage` key and tolerates missing or
-  throwing storage. `page.css` has the "← Games" link and `.sr-only`. `canvas-page.css` is the
+  throwing storage. `rng.ts` is `mulberry32`, the seeded generator behind Slingwell's worlds and
+  Quiz Night's preview round. `page.css` has the "← Games" link and `.sr-only`. `canvas-page.css` is the
   full-window `#game` canvas; set `--page-bg` on `<body>` to match the game's art.
 - `vite.config.ts`: the build's page list (`rollupOptions.input`) and the test coverage config.
 - `tests/menu.test.ts`: keeps the menu cards, the build's page list and the game folders in sync,

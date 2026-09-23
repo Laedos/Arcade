@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { angularSpeed, createGame, type GameState, makePlanet, mulberry32, type Planet, release, step, VIEW_HEIGHT, WORLD_WIDTH } from './game'
+import { angularSpeed, createGame, type GameState, makePlanet, type Planet, release, step, VIEW_HEIGHT, WORLD_WIDTH } from './game'
 
 const DT = 1 / 120
 
@@ -26,19 +26,6 @@ function launchUpward(state: GameState) {
   step(state, 0)
   release(state)
 }
-
-describe('mulberry32', () => {
-  it('is deterministic per seed and stays in [0, 1)', () => {
-    const a = mulberry32(42)
-    const b = mulberry32(42)
-    for (let i = 0; i < 100; i++) {
-      const value = a()
-      expect(value).toBe(b())
-      expect(value).toBeGreaterThanOrEqual(0)
-      expect(value).toBeLessThan(1)
-    }
-  })
-})
 
 describe('createGame', () => {
   it('starts ready on the first planet, with planets generated ahead inside the world', () => {
