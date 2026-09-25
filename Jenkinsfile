@@ -17,7 +17,7 @@ pipeline {
             steps {
                 script {
                     docker.image('node:22-bookworm-slim').inside(
-                        "--network ci-internal -v npm-cache-${env.CACHE_KEY}:/root/.npm"
+                        ciMemoryLimit('4g') + "--network ci-internal -v npm-cache-${env.CACHE_KEY}:/root/.npm"
                     ) {
                         sh 'npm ci'
                         sh 'npm run lint'
