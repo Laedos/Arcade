@@ -5,3 +5,10 @@ test-results
 *.tsbuildinfo
 .wrangler
 .dev.vars
+
+# Local env & secrets (Vite: .env.local / .env.*.local hold real values; .env.development is public)
+*.local
+.env.production
+*.log
+.DS_Store
+.claude/settings.local.json
