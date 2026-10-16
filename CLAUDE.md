@@ -1,8 +1,8 @@
 # Arcade
 
 A collection of small browser games, served at `https://play.sbdevworks.com`. The root is a menu
-page listing every game, and each game lives in its own folder, served at `/<game>/`. This
-started as a single game, Slingwell, and became the parent project on 2026-09-18.
+page listing every game, and each game lives in its own folder, served at `/<game>/`. Its origin as the
+Slingwell repo is in the root `HISTORY.md`.
 
 Shared engineering conventions live in the root [`CLAUDE.md`](../CLAUDE.md); this file covers only
 what's specific to Arcade.
@@ -17,8 +17,7 @@ Arcade not hosted on GitHub Pages; see Doodle Telephone below. One
 `package.json`, one Vitest run, one oxlint run and one multi-page Vite build for the whole
 collection. Games share tooling and a small `shared/src/` (best-score storage, a seeded RNG, page CSS),
 never game logic. Versions follow the web baseline in `CLAUDE-web.md`. `.npmrc` sets
-`legacy-peer-deps`, because npm 9's resolver crashes (`edgesOut`) on vitest 4.1.11, the same bug
-Tenanza hit (npm 10 in CI is fine either way).
+`legacy-peer-deps`, because npm 9's resolver crashes (`edgesOut`) on vitest 4.1.11 (npm 10 in CI is fine either way).
 
 ## Layout
 
@@ -265,7 +264,7 @@ Sound, pause, haptics, and a daily-seed mode (Slingwell's seeded generator alrea
 
 ## Deployment
 
-GitHub Pages from the public repo `Laedos/Arcade` (renamed from `Laedos/Slingwell`). It has to be
+GitHub Pages from the public repo `Laedos/Arcade`. It has to be
 public because the free plan only serves Pages from public repos.
 `.github/workflows/deploy-pages.yml` builds and publishes `dist/` on every push to `main`. That
 workflow is deploy only; CI is the Jenkins job `job/Arcade`. The custom domain comes from
